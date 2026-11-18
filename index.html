@@ -56,13 +56,13 @@ h1,h2,h3{margin:0;font-weight:800;letter-spacing:-.02em}
 .rules li{display:flex;gap:10px;font-size:14px;line-height:1.4;color:var(--mute)}
 .rules li i{flex:none;width:26px;height:26px;border-radius:9px;background:var(--card);display:grid;place-items:center;font-style:normal;font-size:13px;font-weight:800;color:var(--ink)}
 .main{flex:1;display:flex;flex-direction:column;gap:18px;min-width:0}
-.sessions{flex:2.6;display:grid;grid-template-columns:repeat(3,1fr);gap:18px;min-height:0}
+.sessions{flex:1;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;gap:18px;min-height:0}
 .scard{position:relative;border-radius:28px;overflow:hidden;background:var(--card);display:flex;flex-direction:column;text-align:left;border:1px solid var(--line);transition:transform .15s}
 .scard:active{transform:scale(.98)}
 .scard .art{flex:1;min-height:0;background:radial-gradient(120% 90% at 50% 100%,color-mix(in srgb,var(--acc) 40%,transparent),transparent 70%),linear-gradient(180deg,color-mix(in srgb,var(--acc) 14%,var(--card)),var(--card));display:flex;align-items:flex-end;justify-content:center}
-.scard .art svg{width:100%;height:100%;max-height:260px}
-.scard .txt{padding:16px 20px 20px}
-.scard h2{font-size:26px;margin:4px 0 6px}
+.scard .art svg{width:100%;height:100%}
+.scard .txt{padding:12px 20px 18px}
+.scard h2{font-size:24px;margin:3px 0 4px}
 .scard .meta{font-size:14px;color:var(--mute)}
 .scard .next{position:absolute;top:16px;left:16px;background:var(--acc);color:var(--bg);font-weight:800;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:7px 12px;border-radius:999px}
 .scard .num{position:absolute;top:10px;right:18px;font-size:64px;font-weight:900;color:color-mix(in srgb,var(--acc) 35%,transparent);line-height:1}
@@ -71,7 +71,16 @@ h1,h2,h3{margin:0;font-weight:800;letter-spacing:-.02em}
 .xcard .a svg{width:100%;height:100%}
 .xcard h3{font-size:18px;margin:4px 0}
 .xcard p{margin:0;font-size:13px;color:var(--mute);line-height:1.35}
-.foot{font-size:12px;color:var(--dim);text-align:center}
+.foot{font-size:12px;color:var(--dim);text-align:center;margin-top:auto}
+.reset{margin-top:14px;width:100%;height:46px;border-radius:14px;background:var(--card);color:var(--mute);font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px}
+.reset svg{width:18px;height:18px}
+.reset:active{background:var(--card2)}
+.confirm{text-align:center}
+.confirm p{color:var(--mute);font-size:16px;line-height:1.45;margin:0 0 20px}
+.confirm .row{display:flex;gap:10px}
+.confirm .row button{flex:1;height:54px;border-radius:16px;font-weight:800;font-size:16px}
+.confirm .no{background:var(--card);color:var(--ink)}
+.confirm .yes{background:#FF6B57;color:var(--bg)}
 
 /* ---------- SESSION ---------- */
 #session{flex-direction:column;gap:16px}
@@ -174,10 +183,8 @@ h1,h2,h3{margin:0;font-weight:800;letter-spacing:-.02em}
   /* portrait fallback: stack */
   #home{flex-direction:column;overflow:auto}
   .side{width:auto;overflow:visible}
-  .sessions{grid-template-columns:1fr;flex:none}
+  .sessions{grid-template-columns:1fr;grid-template-rows:none;flex:none}
   .scard{height:300px}
-  .extras{grid-template-columns:1fr;flex:none}
-  .xcard{height:130px}
   .split{flex-direction:column}
   .list{width:auto;flex:none;flex-direction:row;overflow-x:auto}
   .list .grp{display:none}
@@ -242,21 +249,12 @@ html:not(.js) .view, html:not(.js) .rot{display:none!important}
     <div class="panel">
       <h3>Ma progression <small id="pct"></small></h3>
       <div class="track" id="track"></div>
-    </div>
-    <div class="panel">
-      <h3>Règles du jeu</h3>
-      <ul class="rules">
-        <li><i>1</i><span>Lundi, mercredi, vendredi, avec au moins un jour de repos entre deux séances.</span></li>
-        <li><i>3s</i><span>Descente lente, 3 secondes. C’est ce qui rend 2&nbsp;kg efficaces.</span></li>
-        <li><i>⏱</i><span>Repos&nbsp;: 40&nbsp;s entre exercices, 1&nbsp;min entre deux tours.</span></li>
-        <li><i>✦</i><span>Chaque séance se termine par le finisher cardio de 5 minutes, puis les étirements.</span></li>
-      </ul>
+      <button class="reset" id="resetBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3.5 4v4.5H8"/></svg>Remettre à zéro</button>
     </div>
     <div class="foot">Arrête un exercice en cas de douleur vive, et demande l’avis d’un professionnel si elle persiste.</div>
   </aside>
   <div class="main">
     <div class="sessions" id="sessions"></div>
-    <div class="extras" id="extras"></div>
   </div>
 </section>
 
@@ -619,9 +617,9 @@ const SESSIONS = [
       {ex:'hydrant',dose:'15 par jambe',reps:'15 / jambe'},{ex:'superman',dose:'12 reps',reps:12}]}]},
 ];
 const EXTRAS = [
-  {key:'warm', title:'Échauffement', sub:'5 min · avant chaque séance', color:'--warm', hero:'armcircles', items:WARMUP},
-  {key:'fin', title:'Finisher cardio', sub:'5 min · 40 s d’effort, 20 s de récup', color:'--fin', hero:'jacks', items:FINISHER},
-  {key:'str', title:'Étirements', sub:'5 min · après chaque séance', color:'--str', hero:'hipflexor', items:STRETCH},
+  {key:'warm', title:'Échauffement', sub:'5 min · avant chaque séance', color:'--warm', meta:'5 min · 5 mouvements pour chauffer le corps', hero:'armcircles', items:WARMUP},
+  {key:'fin', title:'Finisher cardio', sub:'5 min · 40 s d’effort, 20 s de récup', color:'--fin', meta:'5 min · 5 exercices · 40 s d’effort, 20 s de récup', hero:'jacks', items:FINISHER},
+  {key:'str', title:'Étirements', sub:'5 min · après chaque séance', color:'--str', meta:'5 min · 6 positions tenues, sans à-coups', hero:'hipflexor', items:STRETCH},
 ];
 
 /* =========================================================
@@ -716,26 +714,30 @@ function show(id){ document.querySelectorAll('.view').forEach(v=>v.classList.tog
 function renderHome(){
   const nx = nextIdx(), nextS = nx<0 ? -1 : nx%3;
   const wrap = $('sessions'); clearFigs(wrap); wrap.innerHTML='';
+  const card=(o)=>{
+    const b=document.createElement('button');
+    b.className='scard'; b.style.setProperty('--acc',`var(${o.color})`);
+    b.innerHTML=`${o.next?'<span class="next">À faire</span>':''}${o.num?`<span class="num">${o.num}</span>`:''}<div class="art"></div>
+      <div class="txt"><div class="eyebrow">${o.ey}</div><h2>${o.title}</h2><div class="meta">${o.meta}</div></div>`;
+    b.onclick=o.go; wrap.appendChild(b);
+    makeFig(b.querySelector('.art'), EX[o.hero], {offset:o.off, vb:'25 -30 210 210'});
+  };
   SESSIONS.forEach((s,i)=>{
     const nbEx = s.blocks.reduce((a,b)=>a+b.items.length,0);
-    const b = document.createElement('button');
-    b.className='scard'; b.style.setProperty('--acc',`var(${s.color})`);
-    b.innerHTML = `${i===nextS?'<span class="next">À faire</span>':''}<span class="num">${s.n}</span><div class="art"></div>
-      <div class="txt"><div class="eyebrow">Séance ${s.n}</div><h2>${s.title}</h2><div class="meta">${s.rounds} tours · ${nbEx} exercices · + finisher & étirements</div></div>`;
-    b.onclick=()=>openSession(i);
-    wrap.appendChild(b);
-    makeFig(b.querySelector('.art'), EX[s.hero], {offset:i*900, vb:'25 -30 210 210'});
+    card({color:s.color, next:i===nextS, num:s.n, ey:'Séance '+s.n, title:s.title, hero:s.hero, off:i*900,
+      meta:`${s.rounds} tours · ${nbEx} exercices · + finisher & étirements`, go:()=>openSession(i)});
   });
-  const ex = $('extras'); clearFigs(ex); ex.innerHTML='';
-  EXTRAS.forEach((x,i)=>{
-    const b=document.createElement('button');
-    b.className='xcard'; b.style.setProperty('--acc',`var(${x.color})`);
-    b.innerHTML=`<div class="a" style="width:42%;height:100%;flex:none;display:flex"></div><div style="min-width:0"><div class="eyebrow">${x.items.length} mouvements</div><h3>${x.title}</h3><p>${x.sub}</p></div>`;
-    b.onclick=()=>openSession('x'+i);
-    ex.appendChild(b);
-    makeFig(b.querySelector('.a'), EX[x.hero], {offset:i*1300, vb:'25 -30 210 210'});
-  });
+  const EY=['Avant chaque séance','Après le circuit','Pour finir'];
+  EXTRAS.forEach((x,i)=>card({color:x.color, ey:EY[i], title:x.title, hero:x.hero, off:400+i*1100,
+      meta:x.meta, go:()=>openSession('x'+i)}));
 }
+$('resetBtn').onclick=()=>{
+  $('sheetBox').innerHTML=`<div class="confirm"><h2>Remettre la progression à zéro ?</h2><p>Les ${store.get().filter(Boolean).length} séances cochées seront effacées. Le programme repartira de la semaine 1.</p><div class="row"><button class="no" id="cNo">Annuler</button><button class="yes" id="cYes">Remettre à zéro</button></div></div>`;
+  $('sheet').classList.add('on');
+  $('cNo').onclick=()=>$('sheet').classList.remove('on');
+  $('cYes').onclick=()=>{ store.set(Array(12).fill(false)); $('sheet').classList.remove('on'); renderTrack(); renderHome(); };
+};
+$('sheet').addEventListener('click',e=>{ if(e.target.id==='sheet') $('sheet').classList.remove('on'); });
 
 /* =========================================================
    7. ÉCRAN SÉANCE
@@ -752,7 +754,7 @@ function openSession(key){
   let title, ey, sub, color;
   if(typeof key==='string'){ const x=EXTRAS[+key.slice(1)]; title=x.title; ey='Bloc commun'; sub=x.sub; color=x.color; }
   else { const s=SESSIONS[key]; title=s.title; ey='Séance '+s.n; color=s.color;
-    sub=`${s.rounds} tours · 40 s de repos entre exercices · 1 min entre les tours`; }
+    sub=`${s.rounds} tours${s.blocks.length>1?' (abdos puis bras à chaque tour)':''} · 40 s de repos entre exercices · 1 min entre les tours`; }
   cur.acc=color;
   $('session').style.setProperty('--acc',`var(${color})`);
   $('sEy').textContent=ey; $('sTitle').textContent=title; $('sSub').textContent=sub;
@@ -818,18 +820,16 @@ function buildSteps(key){
   const s=SESSIONS[key];
   WARMUP.forEach(it=>pushEx(it,'Échauffement'));
   pushRest(30,'Échauffement','Prépare-toi');
-  s.blocks.forEach((bl,bi)=>{
-    for(let r=1;r<=s.rounds;r++){
-      const sect = (s.blocks.length>1?bl.label+' · ':'')+`Tour ${r}/${s.rounds}`;
-      bl.items.forEach((it,i)=>{
-        pushEx(it,sect);
-        const lastInRound = i===bl.items.length-1;
-        if(!lastInRound) pushRest(40,sect,'Repos');
-        else if(r<s.rounds) pushRest(60,sect,'Repos entre les tours');
-        else pushRest(60,sect, bi<s.blocks.length-1?'Repos avant le bloc suivant':'Repos avant le finisher');
-      });
-    }
-  });
+  // les blocs s'enchaînent dans chaque tour (séance 2 : abdos puis bras, à chaque tour)
+  const round = s.blocks.flatMap(bl=>bl.items.map(it=>({it,label:bl.label})));
+  for(let r=1;r<=s.rounds;r++){
+    round.forEach((x,i)=>{
+      const sect = (s.blocks.length>1?x.label+' · ':'')+`Tour ${r}/${s.rounds}`;
+      pushEx(x.it,sect);
+      if(i<round.length-1) pushRest(40,sect,'Repos');
+      else pushRest(60,sect, r<s.rounds?'Repos entre les tours':'Repos avant le finisher');
+    });
+  }
   FINISHER.forEach((it,i)=>{ pushEx(it,'Finisher cardio'); if(i<FINISHER.length-1) pushRest(20,'Finisher cardio','Récupération'); });
   pushRest(20,'Étirements','Place-toi pour les étirements');
   STRETCH.forEach(it=>pushEx(it,'Étirements'));
