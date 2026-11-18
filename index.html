@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#14162B">
+<title>Programme maison</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<meta name="apple-mobile-web-app-title" content="Sport maison">
+<style>
+:root{
+  --bg:#14162B; --bg2:#1C1F3A; --card:#23274A; --card2:#2B3058; --line:#363B68;
+  --ink:#F3F1EA; --mute:#A3A6C8; --dim:#6F739E;
+  --s1:#FF6B57; --s2:#9B7CFF; --s3:#22C7A9; --fin:#FFB547; --warm:#5CB8FF; --str:#F98BC6;
+  --acc:var(--s1);
+  --r:22px;
+  --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
+  --sal:env(safe-area-inset-left,0px); --sar:env(safe-area-inset-right,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;overscroll-behavior:none}
+body{overflow:hidden;user-select:none;-webkit-user-select:none}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+.view{position:fixed;inset:0;padding:calc(var(--sat) + 22px) calc(var(--sar) + 28px) calc(var(--sab) + 22px) calc(var(--sal) + 28px);display:none}
+.view.on{display:flex}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--acc)}
+h1,h2,h3{margin:0;font-weight:800;letter-spacing:-.02em}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:var(--card);color:var(--mute);font-size:14px;font-weight:600}
+.chip b{color:var(--ink)}
+.badge{display:inline-block;padding:6px 12px;border-radius:999px;font-size:14px;font-weight:700;background:color-mix(in srgb,var(--acc) 18%,transparent);color:var(--acc);white-space:nowrap}
+
+/* ---------- HOME ---------- */
+#home{gap:26px}
+.side{width:360px;flex:none;display:flex;flex-direction:column;gap:18px;overflow:auto;padding-bottom:4px}
+.hero h1{font-size:36px;line-height:1.02;margin:8px 0 10px}
+.hero p{margin:0;color:var(--mute);font-size:16px;line-height:1.45}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.panel{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.panel h3{font-size:16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.panel h3 small{font-weight:600;color:var(--dim);font-size:13px}
+.track{display:grid;grid-template-columns:auto repeat(3,1fr);gap:8px;align-items:center}
+.track .wk{font-size:13px;color:var(--mute);font-weight:700;padding-right:4px}
+.track .hd{font-size:12px;color:var(--dim);font-weight:700;text-align:center}
+.cell{height:40px;border-radius:12px;background:var(--card);border:1.5px dashed var(--line);display:grid;place-items:center;transition:.2s}
+.cell.done{border:0;background:var(--c)}
+.cell.done::after{content:"";width:14px;height:8px;border-left:3px solid var(--bg);border-bottom:3px solid var(--bg);transform:translateY(-2px) rotate(-45deg)}
+.cell.next{border:2px solid var(--c);border-style:solid}
+.rules{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+.rules li{display:flex;gap:10px;font-size:14px;line-height:1.4;color:var(--mute)}
+.rules li i{flex:none;width:26px;height:26px;border-radius:9px;background:var(--card);display:grid;place-items:center;font-style:normal;font-size:13px;font-weight:800;color:var(--ink)}
+.main{flex:1;display:flex;flex-direction:column;gap:18px;min-width:0}
+.sessions{flex:2.6;display:grid;grid-template-columns:repeat(3,1fr);gap:18px;min-height:0}
+.scard{position:relative;border-radius:28px;overflow:hidden;background:var(--card);display:flex;flex-direction:column;text-align:left;border:1px solid var(--line);transition:transform .15s}
+.scard:active{transform:scale(.98)}
+.scard .art{flex:1;min-height:0;background:radial-gradient(120% 90% at 50% 100%,color-mix(in srgb,var(--acc) 40%,transparent),transparent 70%),linear-gradient(180deg,color-mix(in srgb,var(--acc) 14%,var(--card)),var(--card));display:flex;align-items:flex-end;justify-content:center}
+.scard .art svg{width:100%;height:100%;max-height:260px}
+.scard .txt{padding:16px 20px 20px}
+.scard h2{font-size:26px;margin:4px 0 6px}
+.scard .meta{font-size:14px;color:var(--mute)}
+.scard .next{position:absolute;top:16px;left:16px;background:var(--acc);color:var(--bg);font-weight:800;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:7px 12px;border-radius:999px}
+.scard .num{position:absolute;top:10px;right:18px;font-size:64px;font-weight:900;color:color-mix(in srgb,var(--acc) 35%,transparent);line-height:1}
+.extras{flex:1;max-height:190px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px;min-height:0}
+.xcard{border-radius:24px;background:var(--bg2);border:1px solid var(--line);display:flex;align-items:center;gap:4px;padding:0 16px 0 0;text-align:left;overflow:hidden}
+.xcard .a svg{width:100%;height:100%}
+.xcard h3{font-size:18px;margin:4px 0}
+.xcard p{margin:0;font-size:13px;color:var(--mute);line-height:1.35}
+.foot{font-size:12px;color:var(--dim);text-align:center}
+
+/* ---------- SESSION ---------- */
+#session{flex-direction:column;gap:16px}
+.topbar{display:flex;align-items:center;gap:16px}
+.back{width:52px;height:52px;border-radius:16px;background:var(--card);display:grid;place-items:center;flex:none}
+.back svg{width:22px;height:22px}
+.topbar .t{flex:1;min-width:0}
+.topbar h1{font-size:30px}
+.topbar .sub{color:var(--mute);font-size:15px;margin-top:2px}
+.go{height:56px;padding:0 28px;border-radius:18px;background:var(--acc);color:var(--bg);font-weight:800;font-size:18px;display:flex;align-items:center;gap:10px;flex:none;box-shadow:0 10px 30px -10px var(--acc)}
+.go svg{width:18px;height:18px}
+.tabs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.tab{height:44px;padding:0 18px;border-radius:14px;background:var(--card);color:var(--mute);font-weight:700;font-size:15px;white-space:nowrap;flex:none}
+.tab.on{background:var(--ink);color:var(--bg)}
+.split{flex:1;display:flex;gap:18px;min-height:0}
+.list{width:330px;flex:none;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-right:2px;scrollbar-width:none}
+.list .grp{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);padding:10px 4px 2px}
+.item{display:flex;align-items:center;gap:10px;padding:8px 14px 8px 8px;border-radius:18px;background:var(--bg2);border:1.5px solid transparent;text-align:left;min-height:72px}
+.item.on{border-color:var(--acc);background:var(--card)}
+.item svg{width:74px;height:56px;flex:none;border-radius:12px;background:var(--card)}
+.item.on svg{background:var(--card2)}
+.item .n{font-weight:700;font-size:16px;line-height:1.2}
+.item .d{font-size:13px;color:var(--acc);font-weight:700;margin-top:3px}
+.stage{flex:1;border-radius:30px;background:var(--bg2);border:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;min-width:0;position:relative}
+.stage .fig{flex:1;min-height:0;position:relative;background:radial-gradient(70% 60% at 50% 95%,color-mix(in srgb,var(--acc) 22%,transparent),transparent 70%)}
+.stage .fig svg{position:absolute;inset:0;width:100%;height:100%}
+.phase{position:absolute;top:18px;left:20px;display:flex;gap:6px}
+.phase span{padding:7px 12px;border-radius:999px;font-size:13px;font-weight:700;background:var(--card);color:var(--dim);transition:.25s}
+.phase span.on{background:var(--ink);color:var(--bg)}
+.viewtag{position:absolute;top:18px;right:20px;font-size:13px;color:var(--dim);font-weight:600}
+.stage .info{display:flex;align-items:center;gap:20px;padding:18px 26px 22px;border-top:1px solid var(--line)}
+.stage .info h2{font-size:28px}
+.stage .info p{margin:6px 0 0;color:var(--mute);font-size:17px;line-height:1.4}
+.stage .info .badge{font-size:18px;padding:10px 18px}
+.nav2{display:flex;gap:8px;margin-left:auto;flex:none}
+.nav2 button{width:52px;height:52px;border-radius:16px;background:var(--card);display:grid;place-items:center}
+.nav2 svg{width:20px;height:20px}
+
+/* ---------- PLAYER ---------- */
+#player{padding:0;flex-direction:column;background:var(--bg)}
+.pbar{height:6px;background:var(--card);margin-top:var(--sat)}
+.pbar i{display:block;height:100%;background:var(--acc);width:0;transition:width .4s}
+.pwrap{flex:1;display:flex;min-height:0;padding:18px calc(var(--sar) + 24px) calc(var(--sab) + 20px) calc(var(--sal) + 24px);gap:22px}
+.pfig{flex:1.45;position:relative;border-radius:32px;background:var(--bg2);overflow:hidden;border:1px solid var(--line)}
+.pfig svg{position:absolute;inset:0;width:100%;height:100%}
+.pfig .glow{position:absolute;inset:0;background:radial-gradient(70% 60% at 50% 95%,color-mix(in srgb,var(--acc) 28%,transparent),transparent 70%)}
+.pfig .sect{position:absolute;top:18px;left:20px;display:flex;gap:8px;z-index:2}
+.pfig .sect span{padding:8px 14px;border-radius:999px;background:var(--card);font-size:14px;font-weight:700;color:var(--mute)}
+.pfig .sect span.a{background:var(--acc);color:var(--bg)}
+.pside{flex:1;display:flex;flex-direction:column;gap:16px;min-width:0}
+.pclose{align-self:flex-end;height:46px;padding:0 18px;border-radius:14px;background:var(--card);color:var(--mute);font-weight:700;font-size:15px}
+.pname .eyebrow{font-size:13px}
+.pname h1{font-size:38px;line-height:1.05;margin:8px 0 10px}
+.pname p{margin:0;color:var(--mute);font-size:18px;line-height:1.45}
+.pbig{flex:1;display:grid;place-items:center;min-height:0}
+.ring{position:relative;width:min(250px,30vh);aspect-ratio:1}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .v{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring .v b{font-size:64px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.03em;line-height:1}
+.ring .v small{display:block;font-size:14px;color:var(--mute);font-weight:600;margin-top:6px}
+.reps{text-align:center}
+.reps b{display:block;font-size:84px;font-weight:900;color:var(--acc);letter-spacing:-.04em;line-height:1}
+.reps span{font-size:18px;color:var(--mute);font-weight:600}
+.switch{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--ink);color:var(--bg);font-weight:800;font-size:22px;padding:16px 26px;border-radius:20px;opacity:0;transition:.3s;pointer-events:none;z-index:3}
+.switch.on{opacity:1}
+.pnext{display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:8px 14px 8px 8px}
+.pnext svg{width:72px;height:54px;border-radius:12px;background:var(--card);flex:none}
+.pnext small{display:block;font-size:12px;color:var(--dim);font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.pnext b{font-size:16px}
+.pctl{display:flex;gap:12px}
+.pctl button{height:68px;border-radius:20px;background:var(--card);display:grid;place-items:center;flex:none;width:68px}
+.pctl button svg{width:24px;height:24px}
+.pctl .main{flex:1;width:auto;background:var(--acc);color:var(--bg);font-size:20px;font-weight:800}
+.restmode .pfig .glow{background:radial-gradient(70% 60% at 50% 95%,color-mix(in srgb,var(--ink) 10%,transparent),transparent 70%)}
+.restmode .pfig svg{opacity:.55}
+.done-screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:var(--bg);z-index:5;text-align:center;padding:30px}
+.done-screen.on{display:flex}
+.done-screen h1{font-size:48px}
+.done-screen p{color:var(--mute);font-size:18px;margin:0;max-width:520px;line-height:1.5}
+.done-screen svg.burst{width:150px;height:150px}
+
+/* modal */
+.sheet{position:fixed;inset:0;background:rgba(8,9,20,.6);display:none;align-items:center;justify-content:center;z-index:20;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.sheet.on{display:flex}
+.sheet .box{width:min(760px,90vw);max-height:86vh;overflow:auto;background:var(--bg2);border:1px solid var(--line);border-radius:28px;padding:26px}
+.sheet h2{font-size:26px;margin-bottom:14px}
+.wlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.wl{background:var(--card);border-radius:18px;overflow:hidden}
+.wl svg{width:100%;height:130px;display:block}
+.wl div{padding:10px 14px 14px}
+.wl b{display:block;font-size:15px}
+.wl span{font-size:13px;color:var(--acc);font-weight:700}
+.sheet .close{margin-top:18px;height:52px;width:100%;border-radius:16px;background:var(--ink);color:var(--bg);font-weight:800;font-size:16px}
+
+/* rotate hint (portrait) */
+.rot{display:none}
+@media (orientation:portrait) and (max-width:1100px){
+  .rot{display:flex;position:fixed;left:50%;bottom:calc(var(--sab) + 16px);transform:translateX(-50%);z-index:30;background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:999px;font-weight:700;font-size:14px;align-items:center;gap:10px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+  .rot svg{width:22px;height:22px}
+  /* portrait fallback: stack */
+  #home{flex-direction:column;overflow:auto}
+  .side{width:auto;overflow:visible}
+  .sessions{grid-template-columns:1fr;flex:none}
+  .scard{height:300px}
+  .extras{grid-template-columns:1fr;flex:none}
+  .xcard{height:130px}
+  .split{flex-direction:column}
+  .list{width:auto;flex:none;flex-direction:row;overflow-x:auto}
+  .list .grp{display:none}
+  .item{min-width:230px}
+  .pwrap{flex-direction:column}
+  .pfig{flex:1.2}
+}
+@media (max-height:700px) and (orientation:landscape){
+  .scard .art svg{max-height:180px}
+  .pname h1{font-size:30px}
+}
+
+/* ---------- version statique (aperçu sans JavaScript) ---------- */
+#nojs{position:fixed;inset:0;overflow:auto;-webkit-overflow-scrolling:touch;padding:calc(var(--sat) + 24px) calc(var(--sar) + 24px) calc(var(--sab) + 40px) calc(var(--sal) + 24px);user-select:text;-webkit-user-select:text}
+.js #nojs{display:none}
+html:not(.js) .view, html:not(.js) .rot{display:none!important}
+#nojs .warn{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 18px;color:var(--mute);font-size:15px;line-height:1.45;margin:18px 0 8px}
+#nojs .warn b{color:var(--ink)}
+#nojs h1{font-size:34px;margin:6px 0 8px}
+#nojs > p{color:var(--mute);font-size:16px;margin:0 0 12px;line-height:1.45}
+#nojs section{margin-top:34px}
+#nojs section h2{font-size:26px;margin:4px 0 4px}
+#nojs section .meta{color:var(--mute);font-size:15px;margin-bottom:14px}
+#nojs .sub{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin:18px 0 10px}
+#nojs .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+#nojs .card{background:var(--bg2);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+#nojs .pics{display:flex;align-items:center;background:var(--card);padding:6px}
+#nojs .pics svg{flex:1;height:120px;min-width:0}
+#nojs .pics .ar{color:var(--dim);font-weight:800;font-size:18px;padding:0 2px}
+#nojs .card .tx{padding:12px 16px 16px}
+#nojs .card .hd{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+#nojs .card b{font-size:16px;line-height:1.25}
+#nojs .card p{margin:6px 0 0;color:var(--mute);font-size:14px;line-height:1.4}
+#nojs ul{color:var(--mute);font-size:15px;line-height:1.5;padding-left:20px}
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.add('js')</script>
+<!--NOJS--><div id="nojs"><div class="eyebrow" style="--acc:var(--s1)">Programme maison</div><h1>Sculpte, tonifie, à la maison.</h1>
+ <p>Fessiers, abdos et jambes sculptés, bras tonifiés. Tout se fait avec un tapis et deux haltères de 2 kg. 3 séances par semaine · environ 35 min · 4 semaines.</p>
+ <div class="warn"><b>Aperçu sans animation.</b> Ton appareil affiche ce fichier en mode aperçu, sans exécuter l’app. Pour les animations, le minuteur et le suivi, ouvre-le dans Safari ou Chrome.</div>
+ <section style="--acc:var(--warm)"><div class="eyebrow">Règles du jeu</div><ul>
+ <li>Lundi, mercredi, vendredi, avec au moins un jour de repos entre deux séances.</li>
+ <li>Descente lente, 3 secondes. C’est ce qui rend 2 kg efficaces.</li>
+ <li>Repos : 40 s entre exercices, 1 min entre deux tours.</li>
+ <li>Chaque séance se termine par le finisher cardio de 5 minutes, puis les étirements.</li></ul></section>
+ <section style="--acc:var(--warm)"><div class="eyebrow">Avant chaque séance</div><h2>Échauffement</h2><div class="meta">5 min</div><div class="grid"><div class="card"><div class="pics"><svg viewBox="19.7 -14.0 248.0 198.4" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="130.0,32.5 150.5,53.0 164.0,29.6" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="130.0,84.5 171.0,83.1 167.5,122.9 178.7,129.4" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="130.0" y1="84.5" x2="130.0" y2="32.5" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="130.0" y1="32.5" x2="130.0" y2="25.5" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="130.0" cy="15.0" r="10.5" fill="#F3F1EA"/><polyline points="130.0,84.5 130.0,125.5 130.0,165.5 143.0,165.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="130.0,32.5 113.4,56.3 108.7,82.8" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="130.0" cy="84.5" r="5.2" fill="var(--warm)"/></svg><span class="ar">→</span><svg viewBox="19.7 -14.0 248.0 198.4" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="130.0,26.0 113.4,49.8 108.7,76.3" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="130.0,78.0 130.0,119.0 130.0,159.0 141.3,165.5" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="130.0" y1="78.0" x2="130.0" y2="26.0" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="130.0" y1="26.0" x2="130.0" y2="19.0" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="130.0" cy="8.5" r="10.5" fill="#F3F1EA"/><polyline points="130.0,78.0 171.0,76.6 167.5,116.4 178.7,122.9" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="130.0,26.0 150.5,46.5 164.0,23.1" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="130.0" cy="78.0" r="5.2" fill="var(--warm)"/></svg></div><div class="tx"><div class="hd"><b>Montées de genoux</b><span class="badge">1 min</span></div><p>Genoux à hauteur de hanches, bras en opposition.</p></div></div><div class="card"><div class="pics"><svg viewBox="-12.1 -43.0 284.2 227.4" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="121.0,81.1 121.0,122.1 121.0,162.1 108.4,165.5" fill="none" stroke="#D9D7EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="139.0,81.1 139.0,122.1 139.0,162.1 151.6,165.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polygon points="115.0,29.1 145.0,29.1 139.0,81.1 121.0,81.1" fill="#F3F1EA" stroke="#F3F1EA" stroke-width="11" stroke-linejoin="round"/><line x1="130.0" y1="29.1" x2="130.0" y2="22.1" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="130.0" cy="11.6" r="10.5" fill="#F3F1EA"/><polyline points="115.0,29.1 98.4,52.9 82.9,75.0" fill="none" stroke="#D9D7EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="145.0,29.1 161.6,52.9 177.1,75.0" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><line x1="121.0" y1="81.1" x2="139.0" y2="81.1" stroke="var(--warm)" stroke-width="7" stroke-linecap="round"/></svg><span class="ar">→</span><svg viewBox="-12.1 -43.0 284.2 227.4" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="121.0,81.1 121.0,122.1 121.0,162.1 108.4,165.5" fill="none" stroke="#D9D7EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="139.0,81.1 139.0,122.1 139.0,162.1 151.6,165.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polygon points="115.0,29.1 145.0,29.1 139.0,81.1 121.0,81.1" fill="#F3F1EA" stroke="#F3F1EA" stroke-width="11" stroke-linejoin="round"/><line x1="130.0" y1="29.1" x2="130.0" y2="22.1" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="130.0" cy="11.6" r="10.5" fill="#F3F1EA"/><polyline points="115.0,29.1 107.5,1.1 100.5,-25.0" fill="none" stroke="#D9D7EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="145.0,29.1 152.5,1.1 159.5,-25.0" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><line x1="121.0" y1="81.1" x2="139.0" y2="81.1" stroke="var(--warm)" stroke-width="7" stroke-linecap="round"/></svg></div><div class="tx"><div class="hd"><b>Cercles de bras</b><span class="badge">30 s dans chaque sens</span></div><p>Grands cercles contrôlés, 30 s dans chaque sens.</p></div></div><div class="card"><div class="pics"><svg viewBox="35.6 -8.0 240.5 192.4" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="140.0,32.0 142.5,60.9 144.9,87.8" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="140.0,84.0 140.0,125.0 140.0,165.0 153.0,165.0" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="140.0" y1="84.0" x2="140.0" y2="32.0" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="140.0" y1="32.0" x2="140.0" y2="25.0" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="140.0" cy="14.5" r="10.5" fill="#F3F1EA"/><polyline points="140.0,84.0 140.0,125.0 140.0,165.0 153.0,165.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="140.0,32.0 145.0,60.6 149.7,87.1" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="140.0" cy="84.0" r="5.2" fill="var(--warm)"/></svg><span class="ar">→</span><svg viewBox="35.6 -8.0 240.5 192.4" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="140.9,74.4 169.8,76.9 196.8,77.8" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="114.9,119.4 155.0,127.9 140.0,165.0 153.0,165.0" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="114.9" y1="119.4" x2="140.9" y2="74.4" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="140.9" y1="74.4" x2="144.4" y2="68.3" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="149.6" cy="59.2" r="10.5" fill="#F3F1EA"/><polyline points="114.9,119.4 155.0,127.9 140.0,165.0 153.0,165.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="140.9,74.4 169.8,76.9 196.8,77.8" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="114.9" cy="119.4" r="5.2" fill="var(--warm)"/></svg></div><div class="tx"><div class="hd"><b>Squats sans charge</b><span class="badge">15 reps</span></div><p>Fesses en arrière, poids sur les talons.</p></div></div><div class="card"><div class="pics"><svg viewBox="54.9 61.1 154.1 123.3" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--warm)" opacity=".55"/><polyline points="99.3,150.6 128.1,153.2 155.1,153.2" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="151.3,150.6 183.6,125.4 178.0,165.0 191.0,165.0" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="151.3" y1="150.6" x2="99.3" y2="150.6" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="99.3" y1="150.6" x2="92.3" y2="150.6" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="81.8" cy="150.6" r="10.5" fill="#F3F1EA"/><polyline points="151.3,150.6 183.6,125.4 178.0,165.0 191.0,165.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="99.3,150.6 128.1,153.2 155.1,153.2" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="151.3" cy="150.6" r="5.2" fill="var(--warm)"/></svg><span class="ar">→</span><svg viewBox="54.9 61.1 154.1 123.3" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--warm)" opacity=".55"/><polyline points="93.6,112.9 121.2,121.8 148.2,122.8" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="141.8,132.3 182.2,125.2 178.0,165.0 191.0,165.0" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="141.8" y1="132.3" x2="93.6" y2="112.9" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="93.6" y1="112.9" x2="87.1" y2="110.2" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="77.4" cy="106.3" r="10.5" fill="#F3F1EA"/><polyline points="141.8,132.3 182.2,125.2 178.0,165.0 191.0,165.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="93.6,112.9 121.2,121.8 148.2,122.8" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="141.8" cy="132.3" r="5.2" fill="var(--warm)"/></svg></div><div class="tx"><div class="hd"><b>Pont fessier</b><span class="badge">15 reps</span></div><p>Serre les fessiers 1 s en haut, sans cambrer le dos.</p></div></div><div class="card"><div class="pics"><svg viewBox="7.6 -11.4 244.8 195.8" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="113.1,78.6 113.1,119.6 113.1,159.6 100.5,163.0" fill="none" stroke="#D9D7EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="130.9,81.1 130.9,122.1 130.9,162.1 143.5,165.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polygon points="114.4,26.3 144.1,30.5 130.9,81.1 113.1,78.6" fill="#F3F1EA" stroke="#F3F1EA" stroke-width="11" stroke-linejoin="round"/><line x1="129.2" y1="28.4" x2="130.2" y2="21.5" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="131.7" cy="11.1" r="10.5" fill="#F3F1EA"/><polyline points="114.4,26.3 92.8,45.7 114.9,61.2" fill="none" stroke="#D9D7EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="144.1,30.5 165.6,49.9 143.5,65.4" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><line x1="113.1" y1="78.6" x2="130.9" y2="81.1" stroke="var(--warm)" stroke-width="7" stroke-linecap="round"/></svg><span class="ar">→</span><svg viewBox="7.6 -11.4 244.8 195.8" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="129.1,81.1 129.1,122.1 129.1,162.1 116.5,165.5" fill="none" stroke="#D9D7EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="146.9,78.6 146.9,119.6 146.9,159.6 159.5,163.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polygon points="115.9,30.5 145.6,26.3 146.9,78.6 129.1,81.1" fill="#F3F1EA" stroke="#F3F1EA" stroke-width="11" stroke-linejoin="round"/><line x1="130.8" y1="28.4" x2="129.8" y2="21.5" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="128.3" cy="11.1" r="10.5" fill="#F3F1EA"/><polyline points="115.9,30.5 94.4,49.9 116.5,65.4" fill="none" stroke="#D9D7EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="145.6,26.3 167.2,45.7 145.1,61.2" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><line x1="129.1" y1="81.1" x2="146.9" y2="78.6" stroke="var(--warm)" stroke-width="7" stroke-linecap="round"/></svg></div><div class="tx"><div class="hd"><b>Rotations de bassin et de tronc</b><span class="badge">1 min</span></div><p>Mains sur les hanches, grands cercles lents.</p></div></div></div></section><section style="--acc:var(--s1)"><div class="eyebrow">Séance 1</div><h2>Fessiers et jambes</h2><div class="meta">4 tours · 40 s de repos entre exercices · 1 min entre les tours</div><div class="grid"><div class="card"><div class="pics"><svg viewBox="8.6 -9.9 242.8 194.3" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="119.0,82.1 109.1,121.9 100.8,161.1 88.5,165.5" fill="none" stroke="#D9D7EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="141.0,82.1 150.9,121.9 159.2,161.1 171.5,165.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polygon points="115.0,30.1 145.0,30.1 141.0,82.1 119.0,82.1" fill="#F3F1EA" stroke="#F3F1EA" stroke-width="11" stroke-linejoin="round"/><line x1="130.0" y1="30.1" x2="130.0" y2="23.1" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="130.0" cy="12.6" r="10.5" fill="#F3F1EA"/><polyline points="115.0,30.1 122.0,58.3 127.6,84.7" fill="none" stroke="#D9D7EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="145.0,30.1 138.0,58.3 132.4,84.7" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><line x1="119.0" y1="82.1" x2="141.0" y2="82.1" stroke="var(--s1)" stroke-width="7" stroke-linecap="round"/><line x1="122.0" y1="84.7" x2="138.0" y2="84.7" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="123.5" y1="84.7" x2="120.5" y2="84.7" stroke="var(--s1)" stroke-width="8" stroke-linecap="round"/><line x1="136.5" y1="84.7" x2="139.5" y2="84.7" stroke="var(--s1)" stroke-width="8" stroke-linecap="round"/></svg><span class="ar">→</span><svg viewBox="8.6 -9.9 242.8 194.3" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="119.0,108.6 80.0,121.3 75.8,161.1 63.6,165.5" fill="none" stroke="#D9D7EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="141.0,108.6 180.0,121.3 184.2,161.1 196.4,165.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polygon points="115.0,56.6 145.0,56.6 141.0,108.6 119.0,108.6" fill="#F3F1EA" stroke="#F3F1EA" stroke-width="11" stroke-linejoin="round"/><line x1="130.0" y1="56.6" x2="130.0" y2="49.6" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="130.0" cy="39.1" r="10.5" fill="#F3F1EA"/><polyline points="115.0,56.6 122.0,84.7 127.6,111.2" fill="none" stroke="#D9D7EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="145.0,56.6 138.0,84.7 132.4,111.2" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><line x1="119.0" y1="108.6" x2="141.0" y2="108.6" stroke="var(--s1)" stroke-width="7" stroke-linecap="round"/><line x1="122.0" y1="111.2" x2="138.0" y2="111.2" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="123.5" y1="111.2" x2="120.5" y2="111.2" stroke="var(--s1)" stroke-width="8" stroke-linecap="round"/><line x1="136.5" y1="111.2" x2="139.5" y2="111.2" stroke="var(--s1)" stroke-width="8" stroke-linecap="round"/></svg></div><div class="tx"><div class="hd"><b>Squat sumo avec haltère</b><span class="badge">15 reps</span></div><p>Pieds écartés, pointes ouvertes. Descends en 3 s, pousse sur les talons.</p></div></div><div class="card"><div class="pics"><svg viewBox="-14.1 -8.0 240.5 192.4" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="150.0,32.0 148.5,61.0 147.1,87.9" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="150.0,84.0 150.0,125.0 150.0,165.0 163.0,165.0" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="150.0" y1="84.0" x2="150.0" y2="32.0" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="150.0" y1="32.0" x2="150.0" y2="25.0" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="150.0" cy="14.5" r="10.5" fill="#F3F1EA"/><polyline points="150.0,84.0 150.0,125.0 150.0,165.0 163.0,165.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="150.0,32.0 151.5,61.0 152.9,87.9" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="150.0" cy="84.0" r="5.2" fill="var(--s1)"/></svg><span class="ar">→</span><svg viewBox="-14.1 -8.0 240.5 192.4" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="109.1,70.1 107.6,99.1 106.2,126.1" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="109.1,122.1 93.7,160.2 53.8,158.8 49.3,146.5" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="109.1" y1="122.1" x2="109.1" y2="70.1" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="109.1" y1="70.1" x2="109.1" y2="63.1" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="109.1" cy="52.6" r="10.5" fill="#F3F1EA"/><polyline points="109.1,122.1 150.0,125.0 150.0,165.0 163.0,165.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="109.1,70.1 110.6,99.1 112.0,126.1" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="109.1" cy="122.1" r="5.2" fill="var(--s1)"/></svg></div><div class="tx"><div class="hd"><b>Fente arrière alternée</b><span class="badge">12 par jambe</span></div><p>Genou avant au-dessus de la cheville, buste droit.</p></div></div><div class="card"><div class="pics"><svg viewBox="54.9 61.1 154.1 123.3" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--s1)" opacity=".55"/><polyline points="99.3,150.6 128.1,153.2 155.1,153.2" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="151.3,150.6 183.6,125.4 178.0,165.0 191.0,165.0" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="151.3" y1="150.6" x2="99.3" y2="150.6" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="99.3" y1="150.6" x2="92.3" y2="150.6" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="81.8" cy="150.6" r="10.5" fill="#F3F1EA"/><polyline points="151.3,150.6 183.6,125.4 178.0,165.0 191.0,165.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="99.3,150.6 128.1,153.2 155.1,153.2" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="151.3" cy="150.6" r="5.2" fill="var(--s1)"/><line x1="159.2" y1="142.4" x2="143.3" y2="140.8" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="157.7" y1="142.3" x2="160.7" y2="142.6" stroke="var(--s1)" stroke-width="8" stroke-linecap="round"/><line x1="144.8" y1="141.0" x2="141.8" y2="140.7" stroke="var(--s1)" stroke-width="8" stroke-linecap="round"/></svg><span class="ar">→</span><svg viewBox="54.9 61.1 154.1 123.3" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--s1)" opacity=".55"/><polyline points="93.6,112.9 121.2,121.8 148.2,122.8" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="141.8,132.3 182.2,125.2 178.0,165.0 191.0,165.0" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="141.8" y1="132.3" x2="93.6" y2="112.9" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="93.6" y1="112.9" x2="87.1" y2="110.2" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="77.4" cy="106.3" r="10.5" fill="#F3F1EA"/><polyline points="141.8,132.3 182.2,125.2 178.0,165.0 191.0,165.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="93.6,112.9 121.2,121.8 148.2,122.8" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="141.8" cy="132.3" r="5.2" fill="var(--s1)"/><line x1="149.8" y1="124.1" x2="133.8" y2="122.5" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="148.3" y1="124.0" x2="151.3" y2="124.3" stroke="var(--s1)" stroke-width="8" stroke-linecap="round"/><line x1="135.3" y1="122.7" x2="132.4" y2="122.4" stroke="var(--s1)" stroke-width="8" stroke-linecap="round"/></svg></div><div class="tx"><div class="hd"><b>Pont fessier, haltères sur les hanches</b><span class="badge">20 reps</span></div><p>Serre les fessiers 1 s en haut, sans cambrer le dos.</p></div></div><div class="card"><div class="pics"><svg viewBox="54.9 34.9 186.9 149.5" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--s1)" opacity=".55"/><polyline points="99.3,150.6 128.1,153.2 155.1,153.2" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="151.3,150.6 183.6,125.4 178.0,165.0 191.0,165.0" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="151.3" y1="150.6" x2="99.3" y2="150.6" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="99.3" y1="150.6" x2="92.3" y2="150.6" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="81.8" cy="150.6" r="10.5" fill="#F3F1EA"/><polyline points="151.3,150.6 184.8,127.1 217.6,104.2 210.2,93.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="99.3,150.6 128.1,153.2 155.1,153.2" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="151.3" cy="150.6" r="5.2" fill="var(--s1)"/></svg><span class="ar">→</span><svg viewBox="54.9 34.9 186.9 149.5" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--s1)" opacity=".55"/><polyline points="93.6,112.9 121.2,121.8 148.2,122.8" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="141.8,132.3 182.2,125.2 178.0,165.0 191.0,165.0" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="141.8" y1="132.3" x2="93.6" y2="112.9" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="93.6" y1="112.9" x2="87.1" y2="110.2" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="77.4" cy="106.3" r="10.5" fill="#F3F1EA"/><polyline points="141.8,132.3 181.9,140.9 221.0,149.2 223.7,136.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="93.6,112.9 121.2,121.8 148.2,122.8" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="141.8" cy="132.3" r="5.2" fill="var(--s1)"/></svg></div><div class="tx"><div class="hd"><b>Hip thrust à une jambe</b><span class="badge">10 par jambe</span></div><p>Une jambe tendue, monte le bassin avec l’autre.</p></div></div><div class="card"><div class="pics"><svg viewBox="25.6 49.0 169.3 135.4" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--s1)" opacity=".55"/><polyline points="152.0,109.5 152.0,138.5 152.0,165.5" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="100.0,109.5 100.0,150.5 60.0,150.5 47.0,150.5" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="100.0" y1="109.5" x2="152.0" y2="109.5" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="152.0" y1="109.5" x2="158.8" y2="107.7" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="168.9" cy="105.0" r="10.5" fill="#F3F1EA"/><polyline points="100.0,109.5 100.0,150.5 60.0,150.5 47.0,150.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="152.0,109.5 152.0,138.5 152.0,165.5" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="100.0" cy="109.5" r="5.2" fill="var(--s1)"/></svg><span class="ar">→</span><svg viewBox="25.6 49.0 169.3 135.4" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--s1)" opacity=".55"/><polyline points="152.0,109.5 152.0,138.5 152.0,165.5" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="100.0,109.5 100.0,150.5 60.0,150.5 47.0,150.5" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="100.0" y1="109.5" x2="152.0" y2="109.5" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="152.0" y1="109.5" x2="158.8" y2="107.7" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="168.9" cy="105.0" r="10.5" fill="#F3F1EA"/><polyline points="100.0,109.5 59.0,108.1 60.4,68.1 47.5,67.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="152.0,109.5 152.0,138.5 152.0,165.5" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="100.0" cy="109.5" r="5.2" fill="var(--s1)"/></svg></div><div class="tx"><div class="hd"><b>Donkey kicks</b><span class="badge">15 par jambe</span></div><p>Dos plat, talon vers le plafond, bassin bien fixe.</p></div></div><div class="card"><div class="pics"><svg viewBox="16.9 33.0 189.3 151.4" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><rect x="70" y="10" width="14" height="162" rx="3" fill="#3A3F72"/><rect x="81" y="10" width="3" height="162" fill="#545A96"/><polyline points="95.0,73.0 113.6,95.2 140.2,90.5" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="95.0,125.0 136.0,125.0 136.0,165.0 149.0,165.0" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="95.0" y1="125.0" x2="95.0" y2="73.0" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="95.0" y1="73.0" x2="95.0" y2="66.0" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="95.0" cy="55.5" r="10.5" fill="#F3F1EA"/><polyline points="95.0,125.0 136.0,125.0 136.0,165.0 149.0,165.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="95.0,73.0 113.6,95.2 140.2,90.5" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="95.0" cy="125.0" r="5.2" fill="var(--s1)"/></svg></div><div class="tx"><div class="hd"><b>Chaise contre un mur</b><span class="badge">30 s</span></div><p>Cuisses parallèles au sol, dos collé au mur.</p></div></div></div></section><section style="--acc:var(--s2)"><div class="eyebrow">Séance 2</div><h2>Abdos et bras</h2><div class="meta">3 tours · 40 s de repos entre exercices · 1 min entre les tours</div><div class="sub">Abdos</div><div class="grid"><div class="card"><div class="pics"><svg viewBox="24.5 27.2 196.5 157.2" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--s2)" opacity=".55"/><polyline points="176.0,136.0 176.0,165.0 203.0,165.0" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="124.5,143.2 83.9,148.9 44.3,154.5 42.5,167.4" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="124.5" y1="143.2" x2="176.0" y2="136.0" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="176.0" y1="136.0" x2="182.9" y2="135.0" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="193.3" cy="133.6" r="10.5" fill="#F3F1EA"/><polyline points="124.5,143.2 83.9,148.9 44.3,154.5 42.5,167.4" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="176.0,136.0 176.0,165.0 203.0,165.0" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="124.5" cy="143.2" r="5.2" fill="var(--s2)"/></svg></div><div class="tx"><div class="hd"><b>Planche</b><span class="badge">30 à 40 s</span></div><p>Corps aligné, ventre et fessiers serrés.</p></div></div><div class="card"><div class="pics"><svg viewBox="50.0 67.2 146.5 117.2" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--s2)" opacity=".55"/><polyline points="90.0,162.0 75.5,136.9 72.7,163.7" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="142.0,162.0 172.5,134.6 165.5,174.0 178.5,174.0" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="142.0" y1="162.0" x2="90.0" y2="162.0" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="90.0" y1="162.0" x2="83.0" y2="162.0" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="72.5" cy="162.0" r="10.5" fill="#F3F1EA"/><polyline points="142.0,162.0 172.5,134.6 165.5,174.0 178.5,174.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="90.0,162.0 75.5,136.9 72.7,163.7" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="142.0" cy="162.0" r="5.2" fill="var(--s2)"/></svg><span class="ar">→</span><svg viewBox="50.0 67.2 146.5 117.2" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--s2)" opacity=".55"/><polyline points="97.0,136.0 98.0,107.0 82.1,128.9" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="142.0,162.0 172.5,134.6 165.5,174.0 178.5,174.0" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="142.0" y1="162.0" x2="97.0" y2="136.0" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="97.0" y1="136.0" x2="91.8" y2="131.3" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="84.0" cy="124.3" r="10.5" fill="#F3F1EA"/><polyline points="142.0,162.0 172.5,134.6 165.5,174.0 178.5,174.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="97.0,136.0 98.0,107.0 82.1,128.9" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="142.0" cy="162.0" r="5.2" fill="var(--s2)"/></svg></div><div class="tx"><div class="hd"><b>Crunch</b><span class="badge">15 reps</span></div><p>Menton décollé de la poitrine, souffle en montant.</p></div></div><div class="card"><div class="pics"><svg viewBox="46.4 39.0 181.8 145.4" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--s2)" opacity=".55"/><polyline points="83.8,142.5 78.8,114.0 65.3,137.3" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="132.0,162.0 171.6,151.4 210.2,141.0 206.9,128.5" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="132.0" y1="162.0" x2="83.8" y2="142.5" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="83.8" y1="142.5" x2="77.9" y2="138.8" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="68.9" cy="133.2" r="10.5" fill="#F3F1EA"/><polyline points="132.0,162.0 146.0,123.5 185.4,130.4 187.7,117.6" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="83.8,142.5 78.8,114.0 65.3,137.3" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="132.0" cy="162.0" r="5.2" fill="var(--s2)"/></svg><span class="ar">→</span><svg viewBox="46.4 39.0 181.8 145.4" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--s2)" opacity=".55"/><polyline points="83.8,142.5 78.8,114.0 65.3,137.3" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="132.0,162.0 146.0,123.5 185.4,130.4 187.7,117.6" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="132.0" y1="162.0" x2="83.8" y2="142.5" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="83.8" y1="142.5" x2="77.9" y2="138.8" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="68.9" cy="133.2" r="10.5" fill="#F3F1EA"/><polyline points="132.0,162.0 171.6,151.4 210.2,141.0 206.9,128.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="83.8,142.5 78.8,114.0 65.3,137.3" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="132.0" cy="162.0" r="5.2" fill="var(--s2)"/></svg></div><div class="tx"><div class="hd"><b>Bicycle crunch</b><span class="badge">20 reps</span></div><p>Coude vers le genou opposé, mouvement lent.</p></div></div><div class="card"><div class="pics"><svg viewBox="16.2 7.2 221.5 177.2" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--s2)" opacity=".55"/><polyline points="88.0,162.0 88.0,133.0 88.0,106.0" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="140.0,162.0 140.0,121.0 180.0,121.0 180.0,108.0" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="140.0" y1="162.0" x2="88.0" y2="162.0" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="88.0" y1="162.0" x2="81.0" y2="162.0" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="70.5" cy="162.0" r="10.5" fill="#F3F1EA"/><polyline points="140.0,162.0 140.0,121.0 180.0,121.0 180.0,108.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="88.0,162.0 88.0,133.0 88.0,106.0" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="140.0" cy="162.0" r="5.2" fill="var(--s2)"/></svg><span class="ar">→</span><svg viewBox="16.2 7.2 221.5 177.2" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--s2)" opacity=".55"/><polyline points="88.0,162.0 88.0,133.0 88.0,106.0" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="140.0,162.0 180.4,154.9 219.8,147.9 217.5,135.1" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="140.0" y1="162.0" x2="88.0" y2="162.0" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="88.0" y1="162.0" x2="81.0" y2="162.0" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="70.5" cy="162.0" r="10.5" fill="#F3F1EA"/><polyline points="140.0,162.0 140.0,121.0 180.0,121.0 180.0,108.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="88.0,162.0 60.4,153.0 34.2,146.5" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="140.0" cy="162.0" r="5.2" fill="var(--s2)"/></svg></div><div class="tx"><div class="hd"><b>Dead bug</b><span class="badge">10 par côté</span></div><p>Lombaires plaquées au sol, bras et jambe opposés.</p></div></div><div class="card"><div class="pics"><svg viewBox="38.0 32.6 189.8 151.8" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--s2)" opacity=".55"/><polyline points="78.0,162.0 107.0,163.0 134.0,163.0" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="130.0,162.0 131.4,121.0 132.8,81.0 119.8,80.6" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="130.0" y1="162.0" x2="78.0" y2="162.0" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="78.0" y1="162.0" x2="71.0" y2="162.0" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="60.5" cy="162.0" r="10.5" fill="#F3F1EA"/><polyline points="130.0,162.0 131.4,121.0 132.8,81.0 119.8,80.6" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="78.0,162.0 107.0,163.0 134.0,163.0" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="130.0" cy="162.0" r="5.2" fill="var(--s2)"/></svg><span class="ar">→</span><svg viewBox="38.0 32.6 189.8 151.8" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--s2)" opacity=".55"/><polyline points="78.0,162.0 107.0,163.0 134.0,163.0" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="130.0,162.0 170.4,154.9 209.8,147.9 207.5,135.1" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="130.0" y1="162.0" x2="78.0" y2="162.0" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="78.0" y1="162.0" x2="71.0" y2="162.0" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="60.5" cy="162.0" r="10.5" fill="#F3F1EA"/><polyline points="130.0,162.0 170.4,154.9 209.8,147.9 207.5,135.1" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="78.0,162.0 107.0,163.0 134.0,163.0" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="130.0" cy="162.0" r="5.2" fill="var(--s2)"/></svg></div><div class="tx"><div class="hd"><b>Relevé de jambes</b><span class="badge">12 reps</span></div><p>Descends les jambes sans cambrer le dos.</p></div></div></div><div class="sub">Bras avec haltères</div><div class="grid"><div class="card"><div class="pics"><svg viewBox="14.3 -7.5 239.9 191.9" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="130.0,32.5 131.0,61.5 132.9,88.4" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="130.0,84.5 130.0,125.5 130.0,165.5 143.0,165.5" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="130.0" y1="84.5" x2="130.0" y2="32.5" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="130.0" y1="32.5" x2="130.0" y2="25.5" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="130.0" cy="15.0" r="10.5" fill="#F3F1EA"/><polyline points="130.0,84.5 130.0,125.5 130.0,165.5 143.0,165.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="130.0,32.5 131.0,61.5 132.9,88.4" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="130.0" cy="84.5" r="5.2" fill="var(--s2)"/><line x1="124.9" y1="89.0" x2="140.9" y2="87.9" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="126.4" y1="88.9" x2="123.4" y2="89.1" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/><line x1="139.4" y1="88.0" x2="142.4" y2="87.8" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/><line x1="124.9" y1="89.0" x2="140.9" y2="87.9" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="126.4" y1="88.9" x2="123.4" y2="89.1" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/><line x1="139.4" y1="88.0" x2="142.4" y2="87.8" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/></svg><span class="ar">→</span><svg viewBox="14.3 -7.5 239.9 191.9" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="130.0,32.5 132.0,61.4 140.4,35.8" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="130.0,84.5 130.0,125.5 130.0,165.5 143.0,165.5" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="130.0" y1="84.5" x2="130.0" y2="32.5" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="130.0" y1="32.5" x2="130.0" y2="25.5" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="130.0" cy="15.0" r="10.5" fill="#F3F1EA"/><polyline points="130.0,84.5 130.0,125.5 130.0,165.5 143.0,165.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="130.0,32.5 132.0,61.4 140.4,35.8" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="130.0" cy="84.5" r="5.2" fill="var(--s2)"/><line x1="148.0" y1="38.2" x2="132.8" y2="33.3" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="146.5" y1="37.8" x2="149.4" y2="38.7" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/><line x1="134.2" y1="33.7" x2="131.3" y2="32.8" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/><line x1="148.0" y1="38.2" x2="132.8" y2="33.3" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="146.5" y1="37.8" x2="149.4" y2="38.7" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/><line x1="134.2" y1="33.7" x2="131.3" y2="32.8" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/></svg></div><div class="tx"><div class="hd"><b>Curl biceps</b><span class="badge">15 reps</span></div><p>Coudes collés au corps, descente lente.</p></div></div><div class="card"><div class="pics"><svg viewBox="-6.4 -40.7 281.4 225.1" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="130.0,32.5 137.0,4.4 125.6,28.8" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="130.0,84.5 130.0,125.5 130.0,165.5 143.0,165.5" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="130.0" y1="84.5" x2="130.0" y2="32.5" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="130.0" y1="32.5" x2="130.0" y2="25.5" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="130.0" cy="15.0" r="10.5" fill="#F3F1EA"/><polyline points="130.0,84.5 130.0,125.5 130.0,165.5 143.0,165.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="130.0,32.5 137.0,4.4 125.6,28.8" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="130.0" cy="84.5" r="5.2" fill="var(--s2)"/><line x1="118.4" y1="25.5" x2="132.9" y2="32.2" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="119.7" y1="26.1" x2="117.0" y2="24.8" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/><line x1="131.5" y1="31.6" x2="134.2" y2="32.8" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/></svg><span class="ar">→</span><svg viewBox="-6.4 -40.7 281.4 225.1" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="130.0,32.5 136.0,4.1 138.9,-22.7" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="130.0,84.5 130.0,125.5 130.0,165.5 143.0,165.5" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="130.0" y1="84.5" x2="130.0" y2="32.5" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="130.0" y1="32.5" x2="130.0" y2="25.5" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="130.0" cy="15.0" r="10.5" fill="#F3F1EA"/><polyline points="130.0,84.5 130.0,125.5 130.0,165.5 143.0,165.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="130.0,32.5 136.0,4.1 138.9,-22.7" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="130.0" cy="84.5" r="5.2" fill="var(--s2)"/><line x1="146.8" y1="-21.9" x2="130.9" y2="-23.6" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="145.3" y1="-22.0" x2="148.3" y2="-21.7" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/><line x1="132.4" y1="-23.4" x2="129.4" y2="-23.7" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/></svg></div><div class="tx"><div class="hd"><b>Extension triceps au-dessus de la tête</b><span class="badge">15 reps</span></div><p>Coudes serrés près des oreilles.</p></div></div><div class="card"><div class="pics"><svg viewBox="8.0 -10.9 244.1 195.3" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="121.0,81.1 121.0,122.1 121.0,162.1 108.4,165.5" fill="none" stroke="#D9D7EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="139.0,81.1 139.0,122.1 139.0,162.1 151.6,165.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polygon points="115.0,29.1 145.0,29.1 139.0,81.1 121.0,81.1" fill="#F3F1EA" stroke="#F3F1EA" stroke-width="11" stroke-linejoin="round"/><line x1="130.0" y1="29.1" x2="130.0" y2="22.1" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="130.0" cy="11.6" r="10.5" fill="#F3F1EA"/><polyline points="115.0,29.1 108.0,57.3 103.3,83.9" fill="none" stroke="#D9D7EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="145.0,29.1 152.0,57.3 156.7,83.9" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><line x1="121.0" y1="81.1" x2="139.0" y2="81.1" stroke="var(--s2)" stroke-width="7" stroke-linecap="round"/><line x1="95.4" y1="82.5" x2="111.2" y2="85.3" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="96.9" y1="82.7" x2="93.9" y2="82.2" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/><line x1="109.7" y1="85.0" x2="112.7" y2="85.5" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/><line x1="148.8" y1="85.3" x2="164.6" y2="82.5" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="150.3" y1="85.0" x2="147.3" y2="85.5" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/><line x1="163.1" y1="82.7" x2="166.1" y2="82.2" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/></svg><span class="ar">→</span><svg viewBox="8.0 -10.9 244.1 195.3" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="121.0,81.1 121.0,122.1 121.0,162.1 108.4,165.5" fill="none" stroke="#D9D7EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="139.0,81.1 139.0,122.1 139.0,162.1 151.6,165.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polygon points="115.0,29.1 145.0,29.1 139.0,81.1 121.0,81.1" fill="#F3F1EA" stroke="#F3F1EA" stroke-width="11" stroke-linejoin="round"/><line x1="130.0" y1="29.1" x2="130.0" y2="22.1" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="130.0" cy="11.6" r="10.5" fill="#F3F1EA"/><polyline points="115.0,29.1 86.1,31.2 59.1,30.2" fill="none" stroke="#D9D7EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="145.0,29.1 173.9,31.2 200.9,30.2" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><line x1="121.0" y1="81.1" x2="139.0" y2="81.1" stroke="var(--s2)" stroke-width="7" stroke-linecap="round"/><line x1="59.4" y1="22.2" x2="58.8" y2="38.2" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="59.3" y1="23.7" x2="59.4" y2="20.7" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/><line x1="58.9" y1="36.7" x2="58.8" y2="39.7" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/><line x1="201.2" y1="38.2" x2="200.6" y2="22.2" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="201.1" y1="36.7" x2="201.2" y2="39.7" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/><line x1="200.7" y1="23.7" x2="200.6" y2="20.7" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/></svg></div><div class="tx"><div class="hd"><b>Élévations latérales</b><span class="badge">15 reps</span></div><p>Monte jusqu’à hauteur d’épaules, pas plus haut.</p></div></div><div class="card"><div class="pics"><svg viewBox="47.0 20.0 205.5 164.4" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="160.7,53.8 161.7,82.8 162.6,109.7" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="120.8,87.2 136.2,125.2 132.0,165.0 145.0,165.0" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="120.8" y1="87.2" x2="160.7" y2="53.8" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="160.7" y1="53.8" x2="166.0" y2="49.3" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="174.1" cy="42.5" r="10.5" fill="#F3F1EA"/><polyline points="120.8,87.2 136.2,125.2 132.0,165.0 145.0,165.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="160.7,53.8 161.7,82.8 162.6,109.7" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="120.8" cy="87.2" r="5.2" fill="var(--s2)"/><line x1="154.6" y1="110.0" x2="170.6" y2="109.5" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="156.1" y1="110.0" x2="153.1" y2="110.1" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/><line x1="169.1" y1="109.5" x2="172.1" y2="109.4" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/><line x1="154.6" y1="110.0" x2="170.6" y2="109.5" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="156.1" y1="110.0" x2="153.1" y2="110.1" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/><line x1="169.1" y1="109.5" x2="172.1" y2="109.4" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/></svg><span class="ar">→</span><svg viewBox="47.0 20.0 205.5 164.4" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="160.7,53.8 131.8,51.3 129.4,78.1" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="120.8,87.2 136.2,125.2 132.0,165.0 145.0,165.0" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="120.8" y1="87.2" x2="160.7" y2="53.8" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="160.7" y1="53.8" x2="166.0" y2="49.3" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="174.1" cy="42.5" r="10.5" fill="#F3F1EA"/><polyline points="120.8,87.2 136.2,125.2 132.0,165.0 145.0,165.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="160.7,53.8 131.8,51.3 129.4,78.1" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="120.8" cy="87.2" r="5.2" fill="var(--s2)"/><line x1="121.4" y1="77.5" x2="137.4" y2="78.8" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="122.9" y1="77.6" x2="119.9" y2="77.3" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/><line x1="135.9" y1="78.7" x2="138.9" y2="79.0" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/><line x1="121.4" y1="77.5" x2="137.4" y2="78.8" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="122.9" y1="77.6" x2="119.9" y2="77.3" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/><line x1="135.9" y1="78.7" x2="138.9" y2="79.0" stroke="var(--s2)" stroke-width="8" stroke-linecap="round"/></svg></div><div class="tx"><div class="hd"><b>Rowing penché</b><span class="badge">15 reps</span></div><p>Dos plat, tire le coude vers la hanche.</p></div></div></div></section><section style="--acc:var(--s3)"><div class="eyebrow">Séance 3</div><h2>Corps entier</h2><div class="meta">4 tours · 40 s de repos entre exercices · 1 min entre les tours</div><div class="grid"><div class="card"><div class="pics"><svg viewBox="-5.8 -41.1 281.9 225.5" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="140.9,74.4 155.4,49.2 150.7,75.8" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="114.9,119.4 155.0,127.9 140.0,165.0 153.0,165.0" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="114.9" y1="119.4" x2="140.9" y2="74.4" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="140.9" y1="74.4" x2="144.4" y2="68.3" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="149.6" cy="59.2" r="10.5" fill="#F3F1EA"/><polyline points="114.9,119.4 155.0,127.9 140.0,165.0 153.0,165.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="140.9,74.4 155.4,49.2 150.7,75.8" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="114.9" cy="119.4" r="5.2" fill="var(--s3)"/><line x1="142.8" y1="74.4" x2="158.6" y2="77.2" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="144.3" y1="74.7" x2="141.3" y2="74.2" stroke="var(--s3)" stroke-width="8" stroke-linecap="round"/><line x1="157.1" y1="77.0" x2="160.0" y2="77.5" stroke="var(--s3)" stroke-width="8" stroke-linecap="round"/><line x1="142.8" y1="74.4" x2="158.6" y2="77.2" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="144.3" y1="74.7" x2="141.3" y2="74.2" stroke="var(--s3)" stroke-width="8" stroke-linecap="round"/><line x1="157.1" y1="77.0" x2="160.0" y2="77.5" stroke="var(--s3)" stroke-width="8" stroke-linecap="round"/></svg><span class="ar">→</span><svg viewBox="-5.8 -41.1 281.9 225.5" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="140.0,32.0 146.0,3.6 149.8,-23.1" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="140.0,84.0 140.0,125.0 140.0,165.0 153.0,165.0" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="140.0" y1="84.0" x2="140.0" y2="32.0" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="140.0" y1="32.0" x2="140.0" y2="25.0" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="140.0" cy="14.5" r="10.5" fill="#F3F1EA"/><polyline points="140.0,84.0 140.0,125.0 140.0,165.0 153.0,165.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="140.0,32.0 146.0,3.6 149.8,-23.1" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="140.0" cy="84.0" r="5.2" fill="var(--s3)"/><line x1="157.7" y1="-22.0" x2="141.9" y2="-24.2" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="156.2" y1="-22.2" x2="159.2" y2="-21.8" stroke="var(--s3)" stroke-width="8" stroke-linecap="round"/><line x1="143.4" y1="-24.0" x2="140.4" y2="-24.4" stroke="var(--s3)" stroke-width="8" stroke-linecap="round"/><line x1="157.7" y1="-22.0" x2="141.9" y2="-24.2" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="156.2" y1="-22.2" x2="159.2" y2="-21.8" stroke="var(--s3)" stroke-width="8" stroke-linecap="round"/><line x1="143.4" y1="-24.0" x2="140.4" y2="-24.4" stroke="var(--s3)" stroke-width="8" stroke-linecap="round"/></svg></div><div class="tx"><div class="hd"><b>Squat + développé épaules</b><span class="badge">12 reps</span></div><p>Haltères aux épaules en bas, pousse vers le haut en remontant.</p></div></div><div class="card"><div class="pics"><svg viewBox="12.8 -7.7 240.2 192.1" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="120.0,84.3 108.7,123.7 97.7,162.1 85.1,165.5" fill="none" stroke="#D9D7EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="140.0,84.3 151.3,123.7 162.3,162.1 174.9,165.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polygon points="115.0,32.3 145.0,32.3 140.0,84.3 120.0,84.3" fill="#F3F1EA" stroke="#F3F1EA" stroke-width="11" stroke-linejoin="round"/><line x1="130.0" y1="32.3" x2="130.0" y2="25.3" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="130.0" cy="14.8" r="10.5" fill="#F3F1EA"/><polyline points="115.0,32.3 124.9,59.5 148.3,73.0" fill="none" stroke="#D9D7EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="145.0,32.3 135.1,59.5 111.7,73.0" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><line x1="120.0" y1="84.3" x2="140.0" y2="84.3" stroke="var(--s3)" stroke-width="7" stroke-linecap="round"/></svg><span class="ar">→</span><svg viewBox="12.8 -7.7 240.2 192.1" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="140.0,102.3 106.0,125.2 72.9,147.6 59.9,147.6" fill="none" stroke="#D9D7EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="160.0,103.0 196.2,122.2 193.4,162.1 206.0,165.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polygon points="136.8,50.1 166.8,51.2 160.0,103.0 140.0,102.3" fill="#F3F1EA" stroke="#F3F1EA" stroke-width="11" stroke-linejoin="round"/><line x1="151.8" y1="50.7" x2="152.1" y2="43.7" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="152.4" cy="33.2" r="10.5" fill="#F3F1EA"/><polyline points="136.8,50.1 146.7,77.4 170.1,90.9" fill="none" stroke="#D9D7EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="166.8,51.2 156.9,78.4 133.5,91.9" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><line x1="140.0" y1="102.3" x2="160.0" y2="103.0" stroke="var(--s3)" stroke-width="7" stroke-linecap="round"/></svg></div><div class="tx"><div class="hd"><b>Fente latérale</b><span class="badge">10 par côté</span></div><p>Fesses en arrière, l’autre jambe reste tendue.</p></div></div><div class="card"><div class="pics"><svg viewBox="37.1 -8.0 240.5 192.4" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="132.0,32.0 130.5,61.0 129.1,87.9" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="132.0,84.0 132.0,125.0 132.0,165.0 145.0,165.0" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="132.0" y1="84.0" x2="132.0" y2="32.0" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="132.0" y1="32.0" x2="132.0" y2="25.0" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="132.0" cy="14.5" r="10.5" fill="#F3F1EA"/><polyline points="132.0,84.0 132.0,125.0 132.0,165.0 145.0,165.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="132.0,32.0 133.5,61.0 134.9,87.9" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="132.0" cy="84.0" r="5.2" fill="var(--s3)"/><line x1="121.1" y1="87.5" x2="137.1" y2="88.3" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="122.6" y1="87.6" x2="119.6" y2="87.4" stroke="var(--s3)" stroke-width="8" stroke-linecap="round"/><line x1="135.6" y1="88.3" x2="138.6" y2="88.4" stroke="var(--s3)" stroke-width="8" stroke-linecap="round"/><line x1="126.9" y1="88.3" x2="142.9" y2="87.5" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="128.4" y1="88.3" x2="125.4" y2="88.4" stroke="var(--s3)" stroke-width="8" stroke-linecap="round"/><line x1="141.4" y1="87.6" x2="144.4" y2="87.4" stroke="var(--s3)" stroke-width="8" stroke-linecap="round"/></svg><span class="ar">→</span><svg viewBox="37.1 -8.0 240.5 192.4" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="172.0,77.5 172.0,106.5 172.0,133.5" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="120.8,86.6 134.8,125.1 132.0,165.0 145.0,165.0" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="120.8" y1="86.6" x2="172.0" y2="77.5" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="172.0" y1="77.5" x2="179.0" y2="77.5" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="189.5" cy="77.5" r="10.5" fill="#F3F1EA"/><polyline points="120.8,86.6 134.8,125.1 132.0,165.0 145.0,165.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="172.0,77.5 172.0,106.5 172.0,133.5" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="120.8" cy="86.6" r="5.2" fill="var(--s3)"/><line x1="164.0" y1="133.5" x2="180.0" y2="133.5" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="165.5" y1="133.5" x2="162.5" y2="133.5" stroke="var(--s3)" stroke-width="8" stroke-linecap="round"/><line x1="178.5" y1="133.5" x2="181.5" y2="133.5" stroke="var(--s3)" stroke-width="8" stroke-linecap="round"/><line x1="164.0" y1="133.5" x2="180.0" y2="133.5" stroke="#C9CCE8" stroke-width="3.4" stroke-linecap="round"/><line x1="165.5" y1="133.5" x2="162.5" y2="133.5" stroke="var(--s3)" stroke-width="8" stroke-linecap="round"/><line x1="178.5" y1="133.5" x2="181.5" y2="133.5" stroke="var(--s3)" stroke-width="8" stroke-linecap="round"/></svg></div><div class="tx"><div class="hd"><b>Soulevé de terre roumain</b><span class="badge">15 reps</span></div><p>Dos plat, envoie le bassin vers l’arrière.</p></div></div><div class="card"><div class="pics"><svg viewBox="44.3 25.3 198.8 159.1" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--s3)" opacity=".55"/><polyline points="182.0,109.0 182.0,138.0 182.0,165.0" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="140.5,140.3 107.7,165.0 70.6,150.0 62.3,140.0" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="140.5" y1="140.3" x2="182.0" y2="109.0" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="182.0" y1="109.0" x2="187.6" y2="104.8" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="196.0" cy="98.5" r="10.5" fill="#F3F1EA"/><polyline points="140.5,140.3 107.7,165.0 70.6,150.0 62.3,140.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="182.0,109.0 182.0,138.0 182.0,165.0" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="140.5" cy="140.3" r="5.2" fill="var(--s3)"/></svg><span class="ar">→</span><svg viewBox="44.3 25.3 198.8 159.1" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--s3)" opacity=".55"/><polyline points="203.6,144.0 175.0,138.9 182.0,165.0" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="152.9,155.7 113.0,164.9 75.9,149.9 67.5,139.9" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="152.9" y1="155.7" x2="203.6" y2="144.0" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="203.6" y1="144.0" x2="210.4" y2="142.4" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="220.6" cy="140.0" r="10.5" fill="#F3F1EA"/><polyline points="152.9,155.7 113.0,164.9 75.9,149.9 67.5,139.9" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="203.6,144.0 175.0,138.9 182.0,165.0" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="152.9" cy="155.7" r="5.2" fill="var(--s3)"/></svg></div><div class="tx"><div class="hd"><b>Pompes sur les genoux</b><span class="badge">10 reps</span></div><p>Corps aligné des genoux à la tête.</p></div></div><div class="card"><div class="pics"><svg viewBox="28.4 30.7 192.2 153.7" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--s3)" opacity=".55"/><polyline points="176.0,136.0 176.0,165.0 202.6,169.7" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="125.3,147.7 85.4,156.9 46.4,165.9 48.7,178.7" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="125.3" y1="147.7" x2="176.0" y2="136.0" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="176.0" y1="136.0" x2="182.8" y2="134.4" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="193.1" cy="132.1" r="10.5" fill="#F3F1EA"/><polyline points="125.3,147.7 85.4,156.9 46.4,165.9 48.7,178.7" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="176.0,136.0 177.0,107.0 177.0,80.0" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="125.3" cy="147.7" r="5.2" fill="var(--s3)"/></svg></div><div class="tx"><div class="hd"><b>Gainage latéral</b><span class="badge">25 s par côté</span></div><p>Hanche haute, coude sous l’épaule.</p></div></div><div class="card"><div class="pics"><svg viewBox="78.5 73.6 138.6 110.8" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--s3)" opacity=".55"/><circle cx="130.0" cy="94.6" r="9" fill="#F3F1EA"/><line x1="130.0" y1="107.6" x2="130.0" y2="103.6" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><polyline points="145.0,107.6 146.3,132.5 146.3,154.5" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="115.0,107.6 113.7,132.5 113.7,154.5" fill="none" stroke="#D9D7EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polygon points="115.0,107.6 145.0,107.6 140.0,115.6 120.0,115.6" fill="#F3F1EA" stroke="#F3F1EA" stroke-width="11" stroke-linejoin="round"/><polyline points="120.0,115.6 117.9,156.5 117.9,161.5 117.9,165.5" fill="none" stroke="#D9D7EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="140.0,115.6 142.1,156.5 142.1,161.5 142.1,165.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="120.0" y1="115.6" x2="140.0" y2="115.6" stroke="var(--s3)" stroke-width="7" stroke-linecap="round"/></svg><span class="ar">→</span><svg viewBox="78.5 73.6 138.6 110.8" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--s3)" opacity=".55"/><circle cx="130.0" cy="94.6" r="9" fill="#F3F1EA"/><line x1="130.0" y1="107.6" x2="130.0" y2="103.6" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><polyline points="145.0,107.6 146.3,132.5 146.3,154.5" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="115.0,107.6 113.7,132.5 113.7,154.5" fill="none" stroke="#D9D7EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polygon points="115.0,107.6 145.0,107.6 140.0,115.6 120.0,115.6" fill="#F3F1EA" stroke="#F3F1EA" stroke-width="11" stroke-linejoin="round"/><polyline points="120.0,115.6 117.9,156.5 117.9,161.5 117.9,165.5" fill="none" stroke="#D9D7EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="140.0,115.6 181.0,117.0 181.8,121.9 181.8,125.9" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="120.0" y1="115.6" x2="140.0" y2="115.6" stroke="var(--s3)" stroke-width="7" stroke-linecap="round"/></svg></div><div class="tx"><div class="hd"><b>Fire hydrants</b><span class="badge">15 par jambe</span></div><p>Vue de derrière, à quatre pattes. Lève le genou plié sur le côté, comme un chien près d’une bouche d’incendie. Bassin immobile.</p></div></div><div class="card"><div class="pics"><svg viewBox="3.0 -6.0 238.0 190.4" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--s3)" opacity=".55"/><polyline points="167.0,162.0 196.0,162.0 223.0,162.0" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="115.0,162.0 74.0,162.0 34.0,162.0 21.0,162.0" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="115.0" y1="162.0" x2="167.0" y2="162.0" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="167.0" y1="162.0" x2="174.0" y2="162.0" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="184.5" cy="162.0" r="10.5" fill="#F3F1EA"/><polyline points="115.0,162.0 74.0,162.0 34.0,162.0 21.0,162.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="167.0,162.0 196.0,162.0 223.0,162.0" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="115.0" cy="162.0" r="5.2" fill="var(--s3)"/></svg><span class="ar">→</span><svg viewBox="3.0 -6.0 238.0 190.4" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--s3)" opacity=".55"/><polyline points="166.6,155.7 193.9,145.7 218.9,135.6" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="115.0,162.0 74.6,154.9 35.5,146.6 22.8,143.9" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="115.0" y1="162.0" x2="166.6" y2="155.7" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="166.6" y1="155.7" x2="173.6" y2="154.8" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="184.0" cy="153.5" r="10.5" fill="#F3F1EA"/><polyline points="115.0,162.0 74.6,154.9 35.5,146.6 22.8,143.9" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="166.6,155.7 193.9,145.7 218.9,135.6" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="115.0" cy="162.0" r="5.2" fill="var(--s3)"/></svg></div><div class="tx"><div class="hd"><b>Superman</b><span class="badge">12 reps</span></div><p>Soulève bras et jambes, nuque dans le prolongement du dos.</p></div></div></div></section><section style="--acc:var(--fin)"><div class="eyebrow">Après chaque séance</div><h2>Finisher cardio</h2><div class="meta">5 min · 40 s d’effort, 20 s de récupération, un seul tour</div><div class="grid"><div class="card"><div class="pics"><svg viewBox="-6.8 -34.6 273.7 219.0" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="121.0,81.2 118.9,122.2 116.8,162.1 104.2,165.5" fill="none" stroke="#D9D7EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="139.0,81.2 141.1,122.2 143.2,162.1 155.8,165.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polygon points="115.0,29.2 145.0,29.2 139.0,81.2 121.0,81.2" fill="#F3F1EA" stroke="#F3F1EA" stroke-width="11" stroke-linejoin="round"/><line x1="130.0" y1="29.2" x2="130.0" y2="22.2" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="130.0" cy="11.7" r="10.5" fill="#F3F1EA"/><polyline points="115.0,29.2 111.0,58.0 108.6,84.9" fill="none" stroke="#D9D7EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="145.0,29.2 149.0,58.0 151.4,84.9" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><line x1="121.0" y1="81.2" x2="139.0" y2="81.2" stroke="var(--fin)" stroke-width="7" stroke-linecap="round"/></svg><span class="ar">→</span><svg viewBox="-6.8 -34.6 273.7 219.0" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="121.0,88.1 104.3,125.6 88.1,162.1 75.5,165.5" fill="none" stroke="#D9D7EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="139.0,88.1 155.7,125.6 171.9,162.1 184.5,165.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polygon points="115.0,36.1 145.0,36.1 139.0,88.1 121.0,88.1" fill="#F3F1EA" stroke="#F3F1EA" stroke-width="11" stroke-linejoin="round"/><line x1="130.0" y1="36.1" x2="130.0" y2="29.1" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="130.0" cy="18.6" r="10.5" fill="#F3F1EA"/><polyline points="115.0,36.1 102.7,9.9 97.1,-16.6" fill="none" stroke="#D9D7EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="145.0,36.1 157.3,9.9 162.9,-16.6" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><line x1="121.0" y1="88.1" x2="139.0" y2="88.1" stroke="var(--fin)" stroke-width="7" stroke-linecap="round"/></svg></div><div class="tx"><div class="hd"><b>Jumping jacks</b><span class="badge">40 s</span></div><p>Reste léger sur les pointes. Sans saut : un pas de côté à la fois.</p></div></div><div class="card"><div class="pics"><svg viewBox="19.7 -14.0 248.0 198.4" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="130.0,32.5 150.5,53.0 164.0,29.6" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="130.0,84.5 171.0,83.1 167.5,122.9 178.7,129.4" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="130.0" y1="84.5" x2="130.0" y2="32.5" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="130.0" y1="32.5" x2="130.0" y2="25.5" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="130.0" cy="15.0" r="10.5" fill="#F3F1EA"/><polyline points="130.0,84.5 130.0,125.5 130.0,165.5 143.0,165.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="130.0,32.5 113.4,56.3 108.7,82.8" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="130.0" cy="84.5" r="5.2" fill="var(--fin)"/></svg><span class="ar">→</span><svg viewBox="19.7 -14.0 248.0 198.4" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="130.0,26.0 113.4,49.8 108.7,76.3" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="130.0,78.0 130.0,119.0 130.0,159.0 141.3,165.5" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="130.0" y1="78.0" x2="130.0" y2="26.0" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="130.0" y1="26.0" x2="130.0" y2="19.0" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="130.0" cy="8.5" r="10.5" fill="#F3F1EA"/><polyline points="130.0,78.0 171.0,76.6 167.5,116.4 178.7,122.9" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="130.0,26.0 150.5,46.5 164.0,23.1" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="130.0" cy="78.0" r="5.2" fill="var(--fin)"/></svg></div><div class="tx"><div class="hd"><b>Montées de genoux</b><span class="badge">40 s</span></div><p>Genoux à hauteur de hanches, bras en opposition.</p></div></div><div class="card"><div class="pics"><svg viewBox="-8.9 -64.9 311.6 249.3" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="156.0,74.9 141.5,100.0 132.3,125.3" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="130.0,119.9 170.1,128.4 155.1,165.5 168.1,165.5" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="130.0" y1="119.9" x2="156.0" y2="74.9" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="156.0" y1="74.9" x2="159.5" y2="68.8" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="164.8" cy="59.7" r="10.5" fill="#F3F1EA"/><polyline points="130.0,119.9 170.1,128.4 155.1,165.5 168.1,165.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="156.0,74.9 141.5,100.0 132.3,125.3" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="130.0" cy="119.9" r="5.2" fill="var(--fin)"/></svg><span class="ar">→</span><svg viewBox="-8.9 -64.9 311.6 249.3" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="130.0,8.6 135.0,-20.0 137.4,-46.9" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="130.0,60.6 127.9,101.5 123.7,141.3 128.1,153.5" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="130.0" y1="60.6" x2="130.0" y2="8.6" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="130.0" y1="8.6" x2="130.0" y2="1.6" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="130.0" cy="-8.9" r="10.5" fill="#F3F1EA"/><polyline points="130.0,60.6 127.9,101.5 123.7,141.3 128.1,153.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="130.0,8.6 135.0,-20.0 137.4,-46.9" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="130.0" cy="60.6" r="5.2" fill="var(--fin)"/></svg></div><div class="tx"><div class="hd"><b>Squats sautés</b><span class="badge">40 s</span></div><p>Réception souple. Variante sans saut : monte sur la pointe des pieds.</p></div></div><div class="card"><div class="pics"><svg viewBox="40.2 40.2 180.2 144.2" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--fin)" opacity=".55"/><polyline points="182.0,109.0 182.0,138.0 182.0,165.0" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="134.5,130.2 174.1,140.8 139.5,160.8 146.0,172.0" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="134.5" y1="130.2" x2="182.0" y2="109.0" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="182.0" y1="109.0" x2="188.4" y2="106.2" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="198.0" cy="101.9" r="10.5" fill="#F3F1EA"/><polyline points="134.5,130.2 97.0,146.8 60.5,163.1 58.2,175.9" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="182.0,109.0 182.0,138.0 182.0,165.0" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="134.5" cy="130.2" r="5.2" fill="var(--fin)"/></svg><span class="ar">→</span><svg viewBox="40.2 40.2 180.2 144.2" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--fin)" opacity=".55"/><polyline points="182.0,109.0 182.0,138.0 182.0,165.0" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="134.5,130.2 97.0,146.8 60.5,163.1 58.2,175.9" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="134.5" y1="130.2" x2="182.0" y2="109.0" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="182.0" y1="109.0" x2="188.4" y2="106.2" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="198.0" cy="101.9" r="10.5" fill="#F3F1EA"/><polyline points="134.5,130.2 174.1,140.8 139.5,160.8 146.0,172.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="182.0,109.0 182.0,138.0 182.0,165.0" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="134.5" cy="130.2" r="5.2" fill="var(--fin)"/></svg></div><div class="tx"><div class="hd"><b>Mountain climbers</b><span class="badge">40 s</span></div><p>Épaules au-dessus des mains, bassin stable.</p></div></div><div class="card"><div class="pics"><svg viewBox="10.8 -6.3 238.3 190.7" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="91.1,83.8 117.4,115.2 152.8,134.0 157.2,146.2" fill="none" stroke="#D9D7EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="108.9,86.3 128.2,122.5 122.6,162.1 135.2,165.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polygon points="92.4,31.5 122.1,35.7 108.9,86.3 91.1,83.8" fill="#F3F1EA" stroke="#F3F1EA" stroke-width="11" stroke-linejoin="round"/><line x1="107.2" y1="33.6" x2="108.2" y2="26.6" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="109.7" cy="16.2" r="10.5" fill="#F3F1EA"/><polyline points="92.4,31.5 64.4,39.0 41.0,52.5" fill="none" stroke="#D9D7EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="122.1,35.7 98.3,52.3 81.0,73.0" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><line x1="91.1" y1="83.8" x2="108.9" y2="86.3" stroke="var(--fin)" stroke-width="7" stroke-linecap="round"/></svg><span class="ar">→</span><svg viewBox="10.8 -6.3 238.3 190.7" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="151.1,86.3 131.8,122.5 137.4,162.1 124.8,165.5" fill="none" stroke="#D9D7EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="168.9,83.8 142.6,115.2 107.2,134.0 102.8,146.2" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polygon points="137.9,35.7 167.6,31.5 168.9,83.8 151.1,86.3" fill="#F3F1EA" stroke="#F3F1EA" stroke-width="11" stroke-linejoin="round"/><line x1="152.8" y1="33.6" x2="151.8" y2="26.6" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="150.3" cy="16.2" r="10.5" fill="#F3F1EA"/><polyline points="137.9,35.7 161.7,52.3 179.0,73.0" fill="none" stroke="#D9D7EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="167.6,31.5 195.6,39.0 219.0,52.5" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><line x1="151.1" y1="86.3" x2="168.9" y2="83.8" stroke="var(--fin)" stroke-width="7" stroke-linecap="round"/></svg></div><div class="tx"><div class="hd"><b>Patineur</b><span class="badge">40 s</span></div><p>Saute d’un pied sur l’autre en balançant les bras.</p></div></div></div></section><section style="--acc:var(--str)"><div class="eyebrow">Pour finir</div><h2>Étirements, 5 minutes</h2><div class="meta">Tiens chaque position sans à-coups, en respirant calmement.</div><div class="grid"><div class="card"><div class="pics"><svg viewBox="51.1 32.6 189.8 151.8" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="130.0,72.6 158.9,70.1 185.5,65.4" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="130.0,124.6 127.1,165.5 118.8,126.4 106.6,121.9" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="130.0" y1="124.6" x2="130.0" y2="72.6" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="130.0" y1="72.6" x2="130.0" y2="65.6" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="130.0" cy="55.1" r="10.5" fill="#F3F1EA"/><polyline points="130.0,124.6 127.1,165.5 118.8,126.4 106.6,121.9" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="130.0,72.6 124.0,101.0 118.4,127.4" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="130.0" cy="124.6" r="5.2" fill="var(--str)"/></svg></div><div class="tx"><div class="hd"><b>Avant des cuisses</b><span class="badge">30 s par jambe</span></div><p>Talon vers la fesse, genoux l’un contre l’autre, bassin sous le buste.</p></div></div><div class="card"><div class="pics"><svg viewBox="40.0 43.9 175.7 140.5" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--str)" opacity=".55"/><polyline points="80.0,162.0 94.5,136.9 119.9,127.7" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="132.0,162.0 139.1,121.6 179.0,118.1 179.0,105.1" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="132.0" y1="162.0" x2="80.0" y2="162.0" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="80.0" y1="162.0" x2="73.0" y2="162.0" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="62.5" cy="162.0" r="10.5" fill="#F3F1EA"/><polyline points="132.0,162.0 152.5,126.5 187.8,145.3 194.3,134.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="80.0,162.0 94.5,136.9 119.9,127.7" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="132.0" cy="162.0" r="5.2" fill="var(--str)"/></svg></div><div class="tx"><div class="hd"><b>Fessiers</b><span class="badge">30 s par côté</span></div><p>Sur le dos, cheville sur le genou opposé, tire la cuisse vers toi.</p></div></div><div class="card"><div class="pics"><svg viewBox="74.0 87.5 121.1 96.9" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--str)" opacity=".55"/><polyline points="126.8,123.4 151.9,137.9 175.7,150.5" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="92.0,162.0 133.0,162.0 173.0,162.0 173.5,149.0" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="92.0" y1="162.0" x2="126.8" y2="123.4" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="126.8" y1="123.4" x2="131.5" y2="118.2" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="138.5" cy="110.4" r="10.5" fill="#F3F1EA"/><polyline points="92.0,162.0 133.0,162.0 173.0,162.0 173.5,149.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="126.8,123.4 151.9,137.9 175.7,150.5" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="92.0" cy="162.0" r="5.2" fill="var(--str)"/></svg></div><div class="tx"><div class="hd"><b>Arrière des cuisses</b><span class="badge">30 s par jambe</span></div><p>Jambe tendue, dos long, descends les mains vers le pied.</p></div></div><div class="card"><div class="pics"><svg viewBox="-6.3 -13.0 246.7 197.4" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><rect x="20" y="170" width="220" height="5.5" rx="2.75" fill="var(--str)" opacity=".55"/><polyline points="128.0,63.2 129.0,34.2 129.0,7.2" fill="none" stroke="#8C90BC" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="131.6,115.1 104.2,145.6 64.2,145.6 51.2,145.6" fill="none" stroke="#8C90BC" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="131.6" y1="115.1" x2="128.0" y2="63.2" stroke="#F3F1EA" stroke-width="17" stroke-linecap="round"/><line x1="128.0" y1="63.2" x2="127.5" y2="56.2" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="126.8" cy="45.8" r="10.5" fill="#F3F1EA"/><polyline points="131.6,115.1 171.4,125.0 170.0,165.0 183.0,165.0" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="128.0,63.2 129.0,34.2 129.0,7.2" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="131.6" cy="115.1" r="5.2" fill="var(--str)"/></svg></div><div class="tx"><div class="hd"><b>Fléchisseurs de hanche</b><span class="badge">30 s par côté</span></div><p>Fente basse, bassin vers l’avant, bras en l’air.</p></div></div><div class="card"><div class="pics"><svg viewBox="-0.2 -17.2 252.0 201.6" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="121.0,81.1 121.0,122.1 121.0,162.1 108.4,165.5" fill="none" stroke="#D9D7EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="139.0,81.1 139.0,122.1 139.0,162.1 151.6,165.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polygon points="115.0,29.1 145.0,29.1 139.0,81.1 121.0,81.1" fill="#F3F1EA" stroke="#F3F1EA" stroke-width="11" stroke-linejoin="round"/><line x1="130.0" y1="29.1" x2="130.0" y2="22.1" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="130.0" cy="11.6" r="10.5" fill="#F3F1EA"/><polyline points="115.0,29.1 100.5,4.0 127.4,1.2" fill="none" stroke="#D9D7EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="145.0,29.1 151.0,0.8 140.0,25.4" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><line x1="121.0" y1="81.1" x2="139.0" y2="81.1" stroke="var(--str)" stroke-width="7" stroke-linecap="round"/></svg></div><div class="tx"><div class="hd"><b>Triceps</b><span class="badge">20 s par bras</span></div><p>Main dans le dos, l’autre main pousse doucement le coude.</p></div></div><div class="card"><div class="pics"><svg viewBox="-1.7 -10.9 244.1 195.3" preserveAspectRatio="xMidYMax meet"><ellipse cx="130" cy="173" rx="105" ry="5" fill="rgba(0,0,0,.28)"/><line x1="22" y1="171" x2="238" y2="171" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/><polyline points="121.0,81.1 121.0,122.1 121.0,162.1 108.4,165.5" fill="none" stroke="#D9D7EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="139.0,81.1 139.0,122.1 139.0,162.1 151.6,165.5" fill="none" stroke="#F3F1EA" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/><polygon points="115.0,29.1 145.0,29.1 139.0,81.1 121.0,81.1" fill="#F3F1EA" stroke="#F3F1EA" stroke-width="11" stroke-linejoin="round"/><line x1="130.0" y1="29.1" x2="130.0" y2="22.1" stroke="#F3F1EA" stroke-width="7" stroke-linecap="round"/><circle cx="130.0" cy="11.6" r="10.5" fill="#F3F1EA"/><polyline points="115.0,29.1 109.0,57.5 134.6,65.8" fill="none" stroke="#D9D7EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="145.0,29.1 116.1,27.1 89.1,27.1" fill="none" stroke="#F3F1EA" stroke-width="8.3" stroke-linecap="round" stroke-linejoin="round"/><line x1="121.0" y1="81.1" x2="139.0" y2="81.1" stroke="var(--str)" stroke-width="7" stroke-linecap="round"/></svg></div><div class="tx"><div class="hd"><b>Épaule</b><span class="badge">20 s par bras</span></div><p>Bras tendu en travers de la poitrine, l’autre bras le maintient.</p></div></div></div></section><p style="margin-top:30px;font-size:13px;color:var(--dim)">Arrête un exercice en cas de douleur vive, et demande l’avis d’un professionnel si elle persiste.</p></div><!--/NOJS-->
+
+<!-- HOME -->
+<section class="view on" id="home">
+  <aside class="side">
+    <div class="hero">
+      <div class="eyebrow" style="--acc:var(--s1)">Programme maison</div>
+      <h1>Sculpte, tonifie,<br>à la maison.</h1>
+      <p>Fessiers, abdos et jambes sculptés, bras tonifiés. Tout se fait avec un tapis et deux haltères de 2&nbsp;kg.</p>
+    </div>
+    <div class="chips">
+      <span class="chip"><b>3</b> séances / semaine</span>
+      <span class="chip">≈ <b>35</b> min</span>
+      <span class="chip"><b>4</b> semaines</span>
+    </div>
+    <div class="panel">
+      <h3>Ma progression <small id="pct"></small></h3>
+      <div class="track" id="track"></div>
+    </div>
+    <div class="panel">
+      <h3>Règles du jeu</h3>
+      <ul class="rules">
+        <li><i>1</i><span>Lundi, mercredi, vendredi, avec au moins un jour de repos entre deux séances.</span></li>
+        <li><i>3s</i><span>Descente lente, 3 secondes. C’est ce qui rend 2&nbsp;kg efficaces.</span></li>
+        <li><i>⏱</i><span>Repos&nbsp;: 40&nbsp;s entre exercices, 1&nbsp;min entre deux tours.</span></li>
+        <li><i>✦</i><span>Chaque séance se termine par le finisher cardio de 5 minutes, puis les étirements.</span></li>
+      </ul>
+    </div>
+    <div class="foot">Arrête un exercice en cas de douleur vive, et demande l’avis d’un professionnel si elle persiste.</div>
+  </aside>
+  <div class="main">
+    <div class="sessions" id="sessions"></div>
+    <div class="extras" id="extras"></div>
+  </div>
+</section>
+
+<!-- SESSION -->
+<section class="view" id="session">
+  <div class="topbar">
+    <button class="back" data-act="home" aria-label="Retour"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4l-8 8 8 8"/></svg></button>
+    <div class="t"><div class="eyebrow" id="sEy"></div><h1 id="sTitle"></h1><div class="sub" id="sSub"></div></div>
+    <button class="go" id="sGo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 3.5v17l14-8.5z"/></svg>Démarrer la séance</button>
+  </div>
+  <div class="tabs" id="sTabs"></div>
+  <div class="split">
+    <div class="list" id="sList"></div>
+    <div class="stage">
+      <div class="fig" id="sFig">
+        <div class="phase" id="sPhase"><span>Départ</span><span>Arrivée</span></div>
+        <div class="viewtag" id="sView"></div>
+      </div>
+      <div class="info">
+        <div style="flex:1;min-width:0"><h2 id="sName"></h2><p id="sTip"></p></div>
+        <span class="badge" id="sDose"></span>
+        <div class="nav2">
+          <button id="sPrev" aria-label="Précédent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4l-8 8 8 8"/></svg></button>
+          <button id="sNext" aria-label="Suivant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4l8 8-8 8"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLAYER -->
+<section class="view" id="player">
+  <div class="pbar"><i id="pBar"></i></div>
+  <div class="pwrap">
+    <div class="pfig">
+      <div class="glow"></div>
+      <div class="sect" id="pSect"></div>
+      <div id="pFig" style="position:absolute;inset:0"></div>
+      <div class="switch" id="pSwitch"></div>
+    </div>
+    <div class="pside">
+      <button class="pclose" id="pClose">Quitter</button>
+      <div class="pname"><div class="eyebrow" id="pEy"></div><h1 id="pName"></h1><p id="pTip"></p></div>
+      <div class="pbig" id="pBig"></div>
+      <div class="pnext" id="pNext"></div>
+      <div class="pctl">
+        <button id="pPrev" aria-label="Précédent"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2.5v14H6zM20 5v14L9.5 12z"/></svg></button>
+        <button id="pPause" aria-label="Pause"></button>
+        <button class="main" id="pMain">Fait</button>
+      </div>
+    </div>
+  </div>
+  <div class="done-screen" id="pDone">
+    <svg class="burst" viewBox="0 0 120 120"><circle cx="60" cy="60" r="44" fill="var(--acc)"/><path d="M40 61l14 14 28-30" fill="none" stroke="var(--bg)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <h1>Séance terminée&nbsp;!</h1>
+    <p id="pDoneTxt"></p>
+    <button class="go" id="pDoneBtn">Retour à l’accueil</button>
+  </div>
+</section>
+
+<div class="sheet" id="sheet"><div class="box" id="sheetBox"></div></div>
+<div class="rot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M8 3l-2 2 2 2"/></svg>Tourne ta tablette en paysage pour plus de confort</div>
+
+<script>
+/* =========================================================
+   1. MOTEUR DE FIGURES (cinématique directe, angles absolus)
+   angle 0 = vers le bas, 90 = vers la droite, 180 = vers le haut
+   ========================================================= */
+const G = 170;                 // ligne du sol
+const VB = '0 -34 260 224';
+const LEN = {torso:52, neck:7, head:10.5, ua:29, fa:27, th:41, sh:40, ft:13};
+const d2r = Math.PI/180;
+const dir = a => [Math.sin(a*d2r), Math.cos(a*d2r)];
+const add = (p,a,l) => { const d=dir(a); return [p[0]+d[0]*l, p[1]+d[1]*l]; };
+const LIMB = {ua:0, fa:0, th:0, sh:0, ft:90};
+
+function norm(p){
+  const o = Object.assign({x:130,y:90,t:180,w:0,sw:0,hd:0,lift:0}, p);
+  o.a = Object.assign({}, LIMB, p.a||{});
+  o.b = Object.assign({}, LIMB, p.a||{}, p.b||{});   // b hérite de a par défaut
+  o.L = Object.assign({}, LEN, p.L||{});
+  return o;
+}
+function lerp(A,B,k){
+  if(k<=0) return A; if(k>=1) return B;
+  const m = (x,y)=> typeof x==='number' ? x+(y-x)*k : x;
+  const o = {...A};
+  for(const key of ['x','y','t','w','sw','hd','lift']) o[key]=m(A[key],B[key]);
+  for(const s of ['a','b']){ o[s]={}; for(const j in A[s]) o[s][j]=m(A[s][j],B[s][j]); }
+  o.L={}; for(const j in A.L) o.L[j]=m(A.L[j],B.L[j]);
+  if(A.pin){ o.pin={...A.pin, x:m(A.pin.x,B.pin?B.pin.x:A.pin.x), y:m(A.pin.y,B.pin?B.pin.y:A.pin.y)}; }
+  return o;
+}
+function fk(p){
+  const L=p.L, H=[p.x,p.y], J={H};
+  J.S = add(H,p.t,L.torso);
+  J.N = add(J.S,p.t+p.hd,L.neck);
+  J.head = add(J.S,p.t+p.hd,L.neck+L.head);
+  for(const s of ['a','b']){
+    const sg = s==='a'?1:-1, q=p[s];
+    const hip = add(H,p.t-90,sg*p.w), sho = add(J.S,p.t-90,sg*p.sw);
+    J['hip'+s]=hip; J['sho'+s]=sho;
+    J['elb'+s]=add(sho,q.ua,L.ua); J['hand'+s]=add(J['elb'+s],q.fa,L.fa);
+    J['knee'+s]=add(hip,q.th,L.th); J['ank'+s]=add(J['knee'+s],q.sh,L.sh);
+    J['toe'+s]=add(J['ank'+s],q.ft,L.ft);
+  }
+  // ancrage
+  let dx=0, dy=0;
+  if(p.pin){ const j=J[p.pin.j]; dx=p.pin.x-j[0]; dy=(p.pin.y??G-5)-j[1]; }
+  else {
+    let m=-1e9;
+    const R={H:8,S:8,head:L.head};
+    for(const k in J){ const r=R[k]??4.5; m=Math.max(m,J[k][1]+r); }
+    dy=G-m;
+  }
+  dy-=p.lift;
+  for(const k in J){ J[k]=[J[k][0]+dx, J[k][1]+dy]; }
+  return J;
+}
+const f1 = n => n.toFixed(1);
+const ln = (a,b,w,c,extra='') => `<line x1="${f1(a[0])}" y1="${f1(a[1])}" x2="${f1(b[0])}" y2="${f1(b[1])}" stroke="${c}" stroke-width="${w}" stroke-linecap="round"${extra}/>`;
+const pl = (pts,w,c) => `<polyline points="${pts.map(p=>f1(p[0])+','+f1(p[1])).join(' ')}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+
+function dumbbell(h, e, acc){
+  // haltère perpendiculaire à l'avant-bras
+  const ang = Math.atan2(h[1]-e[1], h[0]-e[0]);
+  const px=-Math.sin(ang), py=Math.cos(ang);
+  const a=[h[0]+px*8,h[1]+py*8], b=[h[0]-px*8,h[1]-py*8];
+  return ln(a,b,3.4,'#C9CCE8') + ln([h[0]+px*6.5,h[1]+py*6.5],[h[0]+px*9.5,h[1]+py*9.5],8,acc) + ln([h[0]-px*6.5,h[1]-py*6.5],[h[0]-px*9.5,h[1]-py*9.5],8,acc);
+}
+
+function figureSVG(spec, P, opt={}){
+  const J = fk(P);
+  const acc = opt.acc || 'var(--acc)';
+  const near = opt.ghost ? 'rgba(243,241,234,.13)' : '#F3F1EA';
+  const far  = opt.ghost ? 'rgba(243,241,234,.08)' : (spec.view==='front'||spec.view==='back' ? '#D9D7EA' : '#8C90BC');
+  const skin = near;
+  const lw = 9.5;
+  let s='';
+  const arm = (k,c)=> pl([J['sho'+k],J['elb'+k],J['hand'+k]],lw-1.2,c);
+  const leg = (k,c)=> pl([J['hip'+k],J['knee'+k],J['ank'+k],J['toe'+k]],lw,c);
+  // corps
+  let torso;
+  if(P.w>0.5 || P.sw>0.5){
+    const pts=[J.shob,J.shoa,J.hipa,J.hipb];
+    torso = `<polygon points="${pts.map(p=>f1(p[0])+','+f1(p[1])).join(' ')}" fill="${near}" stroke="${near}" stroke-width="11" stroke-linejoin="round"/>`;
+  } else torso = ln(J.H,J.S,17,near);
+  const neck = ln(J.S,J.N,7,near);
+  const head = `<circle cx="${f1(J.head[0])}" cy="${f1(J.head[1])}" r="${P.L.head}" fill="${skin}"/>`;
+  const order = spec.order || (spec.view==='side' ? 'side' : 'front');
+  if(order==='side'){
+    s += arm('b',far) + leg('b',far) + torso + neck + head + leg('a',near) + arm('a',near);
+  } else if(order==='back'){
+    s += head + neck + arm('a',near) + arm('b',far) + torso + leg('b',far) + leg('a',near);
+  } else {
+    s += leg('b',far) + leg('a',near) + torso + neck + head + arm('b',far) + arm('a',near);
+  }
+  // ceinture accent (bassin)
+  if(!opt.ghost){
+    if(P.w>0.5) s += ln(J.hipb,J.hipa,7,acc);
+    else s += `<circle cx="${f1(J.H[0])}" cy="${f1(J.H[1])}" r="5.2" fill="${acc}"/>`;
+  }
+  if(!opt.ghost && spec.db){
+    if(spec.db==='one'){
+      const h=[(J.handa[0]+J.handb[0])/2,(J.handa[1]+J.handb[1])/2], e=[(J.elba[0]+J.elbb[0])/2,(J.elba[1]+J.elbb[1])/2];
+      s+=dumbbell(h,e,acc);
+    } else if(spec.db==='hip'){
+      const h=[J.H[0],J.H[1]-9]; s+=dumbbell(h,[h[0]-1,h[1]+10],acc);
+    } else {
+      if(spec.db!=='a') s+=dumbbell(J.handb,J.elbb,acc);
+      s+=dumbbell(J.handa,J.elba,acc);
+    }
+  }
+  return s;
+}
+function propsSVG(spec,acc){
+  let s=`<ellipse cx="130" cy="${G+3}" rx="105" ry="5" fill="rgba(0,0,0,.28)"/>`;
+  if(spec.mat) s+=`<rect x="20" y="${G}" width="220" height="5.5" rx="2.75" fill="${acc}" opacity=".55"/>`;
+  else s+=`<line x1="22" y1="${G+1}" x2="238" y2="${G+1}" stroke="#4A4F82" stroke-width="2.5" stroke-linecap="round"/>`;
+  if(spec.wall!=null) s+=`<rect x="${spec.wall-14}" y="10" width="14" height="${G-8}" rx="3" fill="#3A3F72"/><rect x="${spec.wall-3}" y="10" width="3" height="${G-8}" fill="#545A96"/>`;
+  return s;
+}
+
+/* =========================================================
+   2. EXERCICES (mises en situation redessinées)
+   ========================================================= */
+const ST = {t:180, a:{ua:3,fa:3}, b:{ua:-3,fa:-3}};             // debout, profil
+const FR = {t:180, w:9, sw:15, a:{ua:10,fa:6,ft:75}, b:{ua:-10,fa:-6,ft:-75}}; // debout, face
+const S = (o)=>({...ST,...o, a:{...ST.a,...(o.a||{})}, b:{...ST.b,...(o.b||{})}});
+const F = (o)=>({...FR,...o, a:{...FR.a,...(o.a||{})}, b:{...FR.b,...(o.b||{})}});
+const LYING = {t:-90, x:120};
+
+const EX = {
+/* ---- échauffement ---- */
+highknees:{name:'Montées de genoux', view:'side', tip:'Genoux à hauteur de hanches, bras en opposition.',
+  A:S({a:{th:0,sh:0,ua:-35,fa:-10}, b:{th:92,sh:-5,ft:60,ua:45,fa:150}}),
+  B:S({a:{th:92,sh:-5,ft:60,ua:45,fa:150}, b:{th:0,sh:0,ua:-35,fa:-10}})},
+armcircles:{name:'Cercles de bras', view:'front', tip:'Grands cercles contrôlés, 30 s dans chaque sens.',
+  A:F({a:{ua:35,fa:35}, b:{ua:-35,fa:-35}}),
+  B:F({a:{ua:165,fa:165}, b:{ua:-165,fa:-165}})},
+squat:{name:'Squats sans charge', view:'side', tip:'Fesses en arrière, poids sur les talons.',
+  A:S({pin:{j:'anka',x:140}, a:{ua:10,fa:10}, b:{ua:5,fa:5}}),
+  B:S({t:150,pin:{j:'anka',x:140}, a:{th:78,sh:-22,ua:85,fa:88}, b:{th:78,sh:-22,ua:85,fa:88}})},
+bridge:{name:'Pont fessier', view:'side', mat:1, tip:'Serre les fessiers 1 s en haut, sans cambrer le dos.',
+  A:{t:-90, pin:{j:'anka',x:178}, a:{th:128,sh:-8,ft:90,ua:85,fa:90}, b:{th:128,sh:-8,ft:90,ua:85,fa:90}},
+  B:{t:-112, pin:{j:'anka',x:178}, a:{th:100,sh:-6,ft:90,ua:72,fa:88}, b:{th:100,sh:-6,ft:90,ua:72,fa:88}}},
+rotations:{name:'Rotations de bassin et de tronc', view:'front', tip:'Mains sur les hanches, grands cercles lents.',
+  A:F({t:172, x:122, a:{ua:48,fa:-55}, b:{ua:-48,fa:55}}),
+  B:F({t:188, x:138, a:{ua:48,fa:-55}, b:{ua:-48,fa:55}})},
+
+/* ---- séance 1 ---- */
+sumo:{name:'Squat sumo avec haltère', view:'front', db:'one', tip:'Pieds écartés, pointes ouvertes. Descends en 3 s, pousse sur les talons.',
+  A:F({w:11, a:{th:14,sh:12,ft:70,ua:-14,fa:-12}, b:{th:-14,sh:-12,ft:-70,ua:14,fa:12}}),
+  B:F({w:11, a:{th:72,sh:6,ft:70,ua:-14,fa:-12}, b:{th:-72,sh:-6,ft:-70,ua:14,fa:12}})},
+reverselunge:{name:'Fente arrière alternée', view:'side', tip:'Genou avant au-dessus de la cheville, buste droit.',
+  A:S({pin:{j:'anka',x:150}}),
+  B:S({pin:{j:'anka',x:150}, a:{th:86,sh:0}, b:{th:-22,sh:-92,ft:-160}})},
+bridgedb:{name:'Pont fessier, haltères sur les hanches', view:'side', mat:1, db:'hip', tip:'Serre les fessiers 1 s en haut, sans cambrer le dos.',
+  A:{t:-90, pin:{j:'anka',x:178}, a:{th:128,sh:-8,ft:90,ua:85,fa:90}, b:{th:128,sh:-8,ft:90,ua:85,fa:90}},
+  B:{t:-112, pin:{j:'anka',x:178}, a:{th:100,sh:-6,ft:90,ua:72,fa:88}, b:{th:100,sh:-6,ft:90,ua:72,fa:88}}},
+hipthrust1:{name:'Hip thrust à une jambe', view:'side', mat:1, tip:'Une jambe tendue, monte le bassin avec l’autre.',
+  A:{t:-90, pin:{j:'ankb',x:178}, a:{th:125,sh:125,ft:215,ua:85,fa:90}, b:{th:128,sh:-8,ft:90,ua:85,fa:90}},
+  B:{t:-112, pin:{j:'ankb',x:178}, a:{th:78,sh:78,ft:168,ua:72,fa:88}, b:{th:100,sh:-6,ft:90,ua:72,fa:88}}},
+donkey:{name:'Donkey kicks', view:'side', mat:1, tip:'Dos plat, talon vers le plafond, bassin bien fixe.',
+  A:{t:90, x:100, hd:15, a:{ua:0,fa:0,th:0,sh:-90,ft:-90}, b:{ua:0,fa:0,th:0,sh:-90,ft:-90}},
+  B:{t:90, x:100, hd:15, a:{ua:0,fa:0,th:-92,sh:178,ft:-95}, b:{ua:0,fa:0,th:0,sh:-90,ft:-90}}},
+wallsit:{name:'Chaise contre un mur', view:'side', wall:84, hold:1, tip:'Cuisses parallèles au sol, dos collé au mur.',
+  A:S({x:95, pin:{j:'anka',x:136}, a:{th:90,sh:0,ua:40,fa:100}, b:{th:90,sh:0,ua:40,fa:100}}),
+  B:S({x:95, pin:{j:'anka',x:136}, hd:3, a:{th:90,sh:0,ua:40,fa:100}, b:{th:90,sh:0,ua:40,fa:100}})},
+
+/* ---- finisher ---- */
+jacks:{name:'Jumping jacks', view:'front', tip:'Reste léger sur les pointes. Sans saut : un pas de côté à la fois.',
+  A:F({a:{th:3,sh:3,ua:8,fa:5}, b:{th:-3,sh:-3,ua:-8,fa:-5}}),
+  B:F({a:{th:24,sh:24,ua:155,fa:168}, b:{th:-24,sh:-24,ua:-155,fa:-168}})},
+jumpsquat:{name:'Squats sautés', view:'side', tip:'Réception souple. Variante sans saut : monte sur la pointe des pieds.',
+  A:S({t:150, a:{th:78,sh:-22,ua:-30,fa:-20}, b:{th:78,sh:-22,ua:-30,fa:-20}}),
+  B:S({lift:12, a:{th:-3,sh:-6,ft:20,ua:170,fa:175}, b:{th:-3,sh:-6,ft:20,ua:170,fa:175}})},
+climbers:{name:'Mountain climbers', view:'side', mat:1, tip:'Épaules au-dessus des mains, bassin stable.',
+  A:{t:114, pin:{j:'handa',x:182}, a:{ua:0,fa:0,th:-66,sh:-66,ft:-10}, b:{ua:0,fa:0,th:75,sh:-60,ft:30}},
+  B:{t:114, pin:{j:'handa',x:182}, a:{ua:0,fa:0,th:75,sh:-60,ft:30}, b:{ua:0,fa:0,th:-66,sh:-66,ft:-10}}},
+skater:{name:'Patineur', view:'front', tip:'Saute d’un pied sur l’autre en balançant les bras.',
+  A:F({x:100, t:172, a:{th:28,sh:-8,ua:-55,fa:-40}, b:{th:40,sh:62,ft:20,ua:-75,fa:-60}}),
+  B:F({x:160, t:188, b:{th:-28,sh:8,ua:55,fa:40}, a:{th:-40,sh:-62,ft:-20,ua:75,fa:60}})},
+
+/* ---- séance 2 : abdos ---- */
+plank:{name:'Planche', view:'side', mat:1, hold:1, tip:'Corps aligné, ventre et fessiers serrés.',
+  A:{t:98, pin:{j:'elba',x:176}, a:{ua:0,fa:90,th:-82,sh:-82,ft:-8}, b:{ua:0,fa:90,th:-82,sh:-82,ft:-8}},
+  B:{t:98, hd:4, pin:{j:'elba',x:176}, a:{ua:0,fa:90,th:-82,sh:-82,ft:-8}, b:{ua:0,fa:90,th:-82,sh:-82,ft:-8}}},
+crunch:{name:'Crunch', view:'side', mat:1, tip:'Menton décollé de la poitrine, souffle en montant.',
+  A:{t:-90, pin:{j:'H',x:142,y:G-8}, a:{ua:-150,fa:-6,th:132,sh:-10,ft:90}, b:{ua:-150,fa:-6,th:132,sh:-10,ft:90}},
+  B:{t:-120, hd:-12, pin:{j:'H',x:142,y:G-8}, a:{ua:-182,fa:-36,th:132,sh:-10,ft:90}, b:{ua:-182,fa:-36,th:132,sh:-10,ft:90}}},
+bicycle:{name:'Bicycle crunch', view:'side', mat:1, tip:'Coude vers le genou opposé, mouvement lent.',
+  A:{t:-112, hd:-10, pin:{j:'H',x:132,y:G-8}, a:{ua:-170,fa:-30,th:160,sh:80,ft:170}, b:{ua:-170,fa:-30,th:105,sh:105,ft:195}},
+  B:{t:-112, hd:-10, pin:{j:'H',x:132,y:G-8}, a:{ua:-170,fa:-30,th:105,sh:105,ft:195}, b:{ua:-170,fa:-30,th:160,sh:80,ft:170}}},
+deadbug:{name:'Dead bug', view:'side', mat:1, tip:'Lombaires plaquées au sol, bras et jambe opposés.',
+  A:{t:-90, pin:{j:'H',x:140,y:G-8}, a:{ua:180,fa:180,th:180,sh:90,ft:180}, b:{ua:180,fa:180,th:180,sh:90,ft:180}},
+  B:{t:-90, pin:{j:'H',x:140,y:G-8}, a:{ua:-108,fa:-104,th:180,sh:90,ft:180}, b:{ua:180,fa:180,th:100,sh:100,ft:190}}},
+legraise:{name:'Relevé de jambes', view:'side', mat:1, tip:'Descends les jambes sans cambrer le dos.',
+  A:{t:-90, pin:{j:'H',x:130,y:G-8}, a:{ua:88,fa:90,th:178,sh:178,ft:268}, b:{ua:88,fa:90,th:178,sh:178,ft:268}},
+  B:{t:-90, pin:{j:'H',x:130,y:G-8}, a:{ua:88,fa:90,th:100,sh:100,ft:190}, b:{ua:88,fa:90,th:100,sh:100,ft:190}}},
+
+/* ---- séance 2 : bras ---- */
+curl:{name:'Curl biceps', view:'side', db:1, tip:'Coudes collés au corps, descente lente.',
+  A:S({a:{ua:2,fa:4}, b:{ua:2,fa:4}}),
+  B:S({a:{ua:4,fa:162}, b:{ua:4,fa:162}})},
+triceps:{name:'Extension triceps au-dessus de la tête', view:'side', db:'one', tip:'Coudes serrés près des oreilles.',
+  A:S({a:{ua:166,fa:-25}, b:{ua:166,fa:-25}}),
+  B:S({a:{ua:168,fa:174}, b:{ua:168,fa:174}})},
+lateral:{name:'Élévations latérales', view:'front', db:1, tip:'Monte jusqu’à hauteur d’épaules, pas plus haut.',
+  A:F({a:{ua:14,fa:10}, b:{ua:-14,fa:-10}}),
+  B:F({a:{ua:86,fa:92}, b:{ua:-86,fa:-92}})},
+row:{name:'Rowing penché', view:'side', db:1, tip:'Dos plat, tire le coude vers la hanche.',
+  A:S({t:130, pin:{j:'anka',x:132}, a:{th:22,sh:-6,ua:2,fa:2}, b:{th:22,sh:-6,ua:2,fa:2}}),
+  B:S({t:130, pin:{j:'anka',x:132}, a:{th:22,sh:-6,ua:-95,fa:-5}, b:{th:22,sh:-6,ua:-95,fa:-5}})},
+
+/* ---- séance 3 ---- */
+squatpress:{name:'Squat + développé épaules', view:'side', db:1, tip:'Haltères aux épaules en bas, pousse vers le haut en remontant.',
+  A:S({t:150, pin:{j:'anka',x:140}, a:{th:78,sh:-22,ua:150,fa:-10}, b:{th:78,sh:-22,ua:150,fa:-10}}),
+  B:S({pin:{j:'anka',x:140}, a:{ua:168,fa:172}, b:{ua:168,fa:172}})},
+sidelunge:{name:'Fente latérale', view:'front', tip:'Fesses en arrière, l’autre jambe reste tendue.',
+  A:F({w:10, x:130, a:{th:16,sh:16,ua:-20,fa:-60}, b:{th:-16,sh:-16,ua:20,fa:60}}),
+  B:F({w:10, x:150, t:178, a:{th:62,sh:-4,ua:-20,fa:-60}, b:{th:-56,sh:-56,ft:-90,ua:20,fa:60}})},
+rdl:{name:'Soulevé de terre roumain', view:'side', db:1, tip:'Dos plat, envoie le bassin vers l’arrière.',
+  A:S({pin:{j:'anka',x:132}}),
+  B:S({t:100, hd:-10, pin:{j:'anka',x:132}, a:{th:20,sh:-4,ua:0,fa:0}, b:{th:20,sh:-4,ua:0,fa:0}})},
+kneepushup:{name:'Pompes sur les genoux', view:'side', mat:1, tip:'Corps aligné des genoux à la tête.',
+  A:{t:127, pin:{j:'handa',x:182}, a:{ua:0,fa:0,th:-53,sh:-112,ft:-140}, b:{ua:0,fa:0,th:-53,sh:-112,ft:-140}},
+  B:{t:103, pin:{j:'handa',x:182}, a:{ua:-100,fa:15,th:-77,sh:-112,ft:-140}, b:{ua:-100,fa:15,th:-77,sh:-112,ft:-140}}},
+sideplank:{name:'Gainage latéral', view:'side', mat:1, hold:1, tip:'Hanche haute, coude sous l’épaule.',
+  A:{t:103, pin:{j:'elbb',x:176}, a:{ua:178,fa:180,th:-77,sh:-77,ft:10}, b:{ua:0,fa:80,th:-77,sh:-77,ft:10}},
+  B:{t:105, pin:{j:'elbb',x:176}, a:{ua:180,fa:182,th:-75,sh:-75,ft:12}, b:{ua:0,fa:80,th:-75,sh:-75,ft:12}}},
+hydrant:{name:'Fire hydrants', view:'back', order:'back', mat:1, tip:'Vue de derrière, à quatre pattes. Lève le genou plié sur le côté, comme un chien près d’une bouche d’incendie. Bassin immobile.',
+  A:{t:180, w:10, sw:15, L:{torso:8, sh:5, ft:4, ua:25, fa:22, neck:4, head:9}, a:{ua:3,fa:0,th:3,sh:0,ft:0}, b:{ua:-3,fa:0,th:-3,sh:0,ft:0}},
+  B:{t:180, w:10, sw:15, L:{torso:8, sh:5, ft:4, ua:25, fa:22, neck:4, head:9}, a:{ua:3,fa:0,th:88,sh:10,ft:0}, b:{ua:-3,fa:0,th:-3,sh:0,ft:0}}},
+superman:{name:'Superman', view:'side', mat:1, tip:'Soulève bras et jambes, nuque dans le prolongement du dos.',
+  A:{t:90, pin:{j:'H',x:115,y:G-8}, a:{ua:90,fa:90,th:-90,sh:-90,ft:-90}, b:{ua:90,fa:90,th:-90,sh:-90,ft:-90}},
+  B:{t:97, pin:{j:'H',x:115,y:G-8}, a:{ua:110,fa:112,th:-100,sh:-102,ft:-102}, b:{ua:110,fa:112,th:-100,sh:-102,ft:-102}}},
+
+/* ---- étirements ---- */
+quadstretch:{name:'Avant des cuisses', view:'side', hold:1, tip:'Talon vers la fesse, genoux l’un contre l’autre, bassin sous le buste.',
+  A:S({a:{th:-4,sh:-168,ft:-110,ua:-12,fa:-12}, b:{ua:95,fa:100}}),
+  B:S({hd:3, a:{th:-6,sh:-170,ft:-110,ua:-13,fa:-13}, b:{ua:95,fa:102}})},
+glutestretch:{name:'Fessiers', view:'side', mat:1, hold:1, tip:'Sur le dos, cheville sur le genou opposé, tire la cuisse vers toi.',
+  A:{t:-90, pin:{j:'H',x:132,y:G-8}, a:{th:150,sh:62,ft:150,ua:150,fa:110}, b:{th:170,sh:95,ft:180,ua:150,fa:110}},
+  B:{t:-90, pin:{j:'H',x:132,y:G-8}, a:{th:142,sh:58,ft:150,ua:145,fa:112}, b:{th:162,sh:92,ft:180,ua:145,fa:112}}},
+hamstretch:{name:'Arrière des cuisses', view:'side', mat:1, hold:1, tip:'Jambe tendue, dos long, descends les mains vers le pied.',
+  A:{t:138, pin:{j:'H',x:92,y:G-8}, a:{th:90,sh:90,ft:178,ua:60,fa:62}, b:{th:90,sh:90,ft:178,ua:60,fa:62}},
+  B:{t:130, pin:{j:'H',x:92,y:G-8}, a:{th:90,sh:90,ft:178,ua:54,fa:54}, b:{th:90,sh:90,ft:178,ua:54,fa:54}}},
+hipflexor:{name:'Fléchisseurs de hanche', view:'side', mat:1, hold:1, tip:'Fente basse, bassin vers l’avant, bras en l’air.',
+  A:{t:184, pin:{j:'anka',x:170}, a:{th:76,sh:-2,ua:178,fa:180}, b:{th:-42,sh:-90,ft:-90,ua:178,fa:180}},
+  B:{t:188, pin:{j:'anka',x:170}, a:{th:72,sh:-4,ua:182,fa:184}, b:{th:-46,sh:-90,ft:-90,ua:182,fa:184}}},
+tricepstretch:{name:'Triceps', view:'front', hold:1, tip:'Main dans le dos, l’autre main pousse doucement le coude.',
+  A:F({a:{ua:168,fa:-24}, b:{ua:-150,fa:96}}),
+  B:F({hd:-4, a:{ua:166,fa:-26}, b:{ua:-148,fa:98}})},
+shoulderstretch:{name:'Épaule', view:'front', hold:1, tip:'Bras tendu en travers de la poitrine, l’autre bras le maintient.',
+  A:F({a:{ua:-94,fa:-90}, b:{ua:-12,fa:72}}),
+  B:F({hd:4, a:{ua:-96,fa:-92}, b:{ua:-12,fa:74}})},
+};
+for(const k in EX){ EX[k].id=k; EX[k].A=norm(EX[k].A); EX[k].B=norm(EX[k].B); }
+const VIEWNAME = {side:'Vue de profil', front:'Vue de face', back:'Vue de derrière'};
+
+/* =========================================================
+   3. PROGRAMME
+   ========================================================= */
+const WARMUP = [
+  {ex:'highknees', dose:'1 min', time:60},
+  {ex:'armcircles', dose:'30 s dans chaque sens', time:60, sw:30, swMsg:'Change de sens'},
+  {ex:'squat', dose:'15 reps', reps:15},
+  {ex:'bridge', dose:'15 reps', reps:15},
+  {ex:'rotations', dose:'1 min', time:60},
+];
+const FINISHER = ['jacks','highknees','jumpsquat','climbers','skater'].map(ex=>({ex, dose:'40 s', time:40}));
+const STRETCH = [
+  {ex:'quadstretch', dose:'30 s par jambe', time:60, sw:30, swMsg:'Change de jambe'},
+  {ex:'glutestretch', dose:'30 s par côté', time:60, sw:30, swMsg:'Change de côté'},
+  {ex:'hamstretch', dose:'30 s par jambe', time:60, sw:30, swMsg:'Change de jambe'},
+  {ex:'hipflexor', dose:'30 s par côté', time:60, sw:30, swMsg:'Change de côté'},
+  {ex:'tricepstretch', dose:'20 s par bras', time:40, sw:20, swMsg:'Change de bras'},
+  {ex:'shoulderstretch', dose:'20 s par bras', time:40, sw:20, swMsg:'Change de bras'},
+];
+const SESSIONS = [
+  {n:1, title:'Fessiers et jambes', color:'--s1', rounds:4, hero:'sumo', blocks:[
+    {label:'Circuit', items:[
+      {ex:'sumo',dose:'15 reps',reps:15},{ex:'reverselunge',dose:'12 par jambe',reps:'12 / jambe'},
+      {ex:'bridgedb',dose:'20 reps',reps:20},{ex:'hipthrust1',dose:'10 par jambe',reps:'10 / jambe'},
+      {ex:'donkey',dose:'15 par jambe',reps:'15 / jambe'},{ex:'wallsit',dose:'30 s',time:30}]}]},
+  {n:2, title:'Abdos et bras', color:'--s2', rounds:3, hero:'curl', blocks:[
+    {label:'Abdos', items:[
+      {ex:'plank',dose:'30 à 40 s',time:40},{ex:'crunch',dose:'15 reps',reps:15},
+      {ex:'bicycle',dose:'20 reps',reps:20},{ex:'deadbug',dose:'10 par côté',reps:'10 / côté'},
+      {ex:'legraise',dose:'12 reps',reps:12}]},
+    {label:'Bras avec haltères', items:[
+      {ex:'curl',dose:'15 reps',reps:15},{ex:'triceps',dose:'15 reps',reps:15},
+      {ex:'lateral',dose:'15 reps',reps:15},{ex:'row',dose:'15 reps',reps:15}]}]},
+  {n:3, title:'Corps entier', color:'--s3', rounds:4, hero:'squatpress', blocks:[
+    {label:'Circuit', items:[
+      {ex:'squatpress',dose:'12 reps',reps:12},{ex:'sidelunge',dose:'10 par côté',reps:'10 / côté'},
+      {ex:'rdl',dose:'15 reps',reps:15},{ex:'kneepushup',dose:'10 reps',reps:10},
+      {ex:'sideplank',dose:'25 s par côté',time:50,sw:25,swMsg:'Change de côté'},
+      {ex:'hydrant',dose:'15 par jambe',reps:'15 / jambe'},{ex:'superman',dose:'12 reps',reps:12}]}]},
+];
+const EXTRAS = [
+  {key:'warm', title:'Échauffement', sub:'5 min · avant chaque séance', color:'--warm', hero:'armcircles', items:WARMUP},
+  {key:'fin', title:'Finisher cardio', sub:'5 min · 40 s d’effort, 20 s de récup', color:'--fin', hero:'jacks', items:FINISHER},
+  {key:'str', title:'Étirements', sub:'5 min · après chaque séance', color:'--str', hero:'hipflexor', items:STRETCH},
+];
+
+/* =========================================================
+   4. ANIMATION
+   ========================================================= */
+const ease = k => k<.5 ? 4*k*k*k : 1-Math.pow(-2*k+2,3)/2;
+function phaseAt(ms, spec){
+  if(spec.hold){ const s=(Math.sin(ms/900)+1)/2; return {k:s, label:-1}; }
+  const T=3400, u=(ms%T)/T;
+  if(u<.16) return {k:0,label:0};
+  if(u<.5) return {k:ease((u-.16)/.34),label:(u-.16)/.34<.5?0:1};
+  if(u<.66) return {k:1,label:1};
+  return {k:1-ease((u-.66)/.34),label:(u-.66)/.34<.5?1:0};
+}
+const figs = new Set();
+function makeFig(container, spec, opt={}){
+  const acc = opt.acc || 'var(--acc)';
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('viewBox', opt.vb || VB);
+  svg.setAttribute('preserveAspectRatio','xMidYMax meet');
+  svg.innerHTML = `<g class="pr">${propsSVG(spec,acc)}</g><g class="gh"></g><g class="bd"></g>`;
+  container.appendChild(svg);
+  const f = {svg, spec, opt, gh:svg.querySelector('.gh'), bd:svg.querySelector('.bd'), last:-1};
+  if(opt.ghost && !spec.hold) f.gh.innerHTML = figureSVG(spec, spec.A, {ghost:1});
+  if(opt.static!=null){ f.bd.innerHTML = figureSVG(spec, opt.static?spec.B:spec.A, {acc}); return f; }
+  figs.add(f); return f;
+}
+function fitVB(spec,pad=14,ar=4/3,minH=0){
+  let x0=1e9,y0=1e9,x1=-1e9,y1=G+6;
+  for(const P of [spec.A,spec.B]){ const J=fk(P); for(const k in J){ const r=k==='head'?P.L.head:6; x0=Math.min(x0,J[k][0]-r); x1=Math.max(x1,J[k][0]+r); y0=Math.min(y0,J[k][1]-r); } }
+  if(spec.wall!=null) x0=Math.min(x0,spec.wall-16);
+  x0-=pad; x1+=pad; y0-=pad; y1+=pad*.7;
+  if(y1-y0<minH) y0=y1-minH;
+  let w=x1-x0, h=y1-y0;
+  if(w/h<ar){ const nw=h*ar; x0-=(nw-w)/2; w=nw; } else { const nh=w/ar; y0-=nh-h; h=nh; }
+  return `${x0.toFixed(1)} ${y0.toFixed(1)} ${w.toFixed(1)} ${h.toFixed(1)}`;
+}
+function clearFigs(root){ for(const f of [...figs]) if(root.contains(f.svg)) figs.delete(f); }
+let paused=false;
+function loop(now){
+  for(const f of figs){
+    if(!f.svg.isConnected){ figs.delete(f); continue; }
+    if(f.svg.getClientRects().length===0) continue;
+    const ph = phaseAt(now + (f.opt.offset||0), f.spec);
+    let P;
+    if(f.spec.hold) P = lerp(f.spec.A, f.spec.B, ph.k);
+    else P = lerp(f.spec.A, f.spec.B, ph.k);
+    f.bd.innerHTML = figureSVG(f.spec, P, {acc:f.opt.acc});
+    if(f.opt.onPhase && ph.label!==f.last){ f.last=ph.label; f.opt.onPhase(ph.label); }
+  }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* =========================================================
+   5. PROGRESSION (stockage local)
+   ========================================================= */
+const store = {
+  get(){ try{ return JSON.parse(localStorage.getItem('pm-progress')||'null') || Array(12).fill(false);}catch(e){ return this._m || Array(12).fill(false);} },
+  set(v){ this._m=v; try{ localStorage.setItem('pm-progress',JSON.stringify(v)); }catch(e){} }
+};
+function nextIdx(){ const p=store.get(); return p.findIndex(x=>!x); }
+function renderTrack(){
+  const p = store.get(), nx = nextIdx();
+  const el = document.getElementById('track');
+  let h = '<span></span>' + SESSIONS.map(s=>`<span class="hd">S${s.n}</span>`).join('');
+  for(let w=0;w<4;w++){
+    h += `<span class="wk">Sem. ${w+1}</span>`;
+    for(let s=0;s<3;s++){
+      const i=w*3+s;
+      h += `<button class="cell ${p[i]?'done':''} ${i===nx?'next':''}" style="--c:var(${SESSIONS[s].color})" data-cell="${i}" aria-label="Semaine ${w+1}, séance ${s+1}"></button>`;
+    }
+  }
+  el.innerHTML = h;
+  document.getElementById('pct').textContent = p.filter(Boolean).length + ' / 12';
+}
+document.getElementById('track').addEventListener('click', e=>{
+  const c=e.target.closest('[data-cell]'); if(!c) return;
+  const p=store.get(); p[+c.dataset.cell]=!p[+c.dataset.cell]; store.set(p); renderTrack(); renderHome();
+});
+function markDone(sn){
+  const p=store.get();
+  for(let w=0;w<4;w++){ const i=w*3+sn-1; if(!p[i]){ p[i]=true; break; } }
+  store.set(p);
+}
+
+/* =========================================================
+   6. ACCUEIL
+   ========================================================= */
+const $ = id => document.getElementById(id);
+function show(id){ document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id)); }
+function renderHome(){
+  const nx = nextIdx(), nextS = nx<0 ? -1 : nx%3;
+  const wrap = $('sessions'); clearFigs(wrap); wrap.innerHTML='';
+  SESSIONS.forEach((s,i)=>{
+    const nbEx = s.blocks.reduce((a,b)=>a+b.items.length,0);
+    const b = document.createElement('button');
+    b.className='scard'; b.style.setProperty('--acc',`var(${s.color})`);
+    b.innerHTML = `${i===nextS?'<span class="next">À faire</span>':''}<span class="num">${s.n}</span><div class="art"></div>
+      <div class="txt"><div class="eyebrow">Séance ${s.n}</div><h2>${s.title}</h2><div class="meta">${s.rounds} tours · ${nbEx} exercices · + finisher & étirements</div></div>`;
+    b.onclick=()=>openSession(i);
+    wrap.appendChild(b);
+    makeFig(b.querySelector('.art'), EX[s.hero], {offset:i*900, vb:'25 -30 210 210'});
+  });
+  const ex = $('extras'); clearFigs(ex); ex.innerHTML='';
+  EXTRAS.forEach((x,i)=>{
+    const b=document.createElement('button');
+    b.className='xcard'; b.style.setProperty('--acc',`var(${x.color})`);
+    b.innerHTML=`<div class="a" style="width:42%;height:100%;flex:none;display:flex"></div><div style="min-width:0"><div class="eyebrow">${x.items.length} mouvements</div><h3>${x.title}</h3><p>${x.sub}</p></div>`;
+    b.onclick=()=>openSession('x'+i);
+    ex.appendChild(b);
+    makeFig(b.querySelector('.a'), EX[x.hero], {offset:i*1300, vb:'25 -30 210 210'});
+  });
+}
+
+/* =========================================================
+   7. ÉCRAN SÉANCE
+   ========================================================= */
+let cur = {key:null, list:[], idx:0, acc:'--s1', tabs:[], tab:0};
+function sessionTabs(key){
+  if(typeof key==='string'){ const x=EXTRAS[+key.slice(1)]; return [{label:x.title, items:x.items}]; }
+  const s=SESSIONS[key];
+  return [{label:'Échauffement',items:WARMUP}, ...s.blocks.map(b=>({label:b.label,items:b.items})),
+          {label:'Finisher cardio',items:FINISHER},{label:'Étirements',items:STRETCH}];
+}
+function openSession(key){
+  cur.key=key;
+  let title, ey, sub, color;
+  if(typeof key==='string'){ const x=EXTRAS[+key.slice(1)]; title=x.title; ey='Bloc commun'; sub=x.sub; color=x.color; }
+  else { const s=SESSIONS[key]; title=s.title; ey='Séance '+s.n; color=s.color;
+    sub=`${s.rounds} tours · 40 s de repos entre exercices · 1 min entre les tours`; }
+  cur.acc=color;
+  $('session').style.setProperty('--acc',`var(${color})`);
+  $('sEy').textContent=ey; $('sTitle').textContent=title; $('sSub').textContent=sub;
+  cur.tabs=sessionTabs(key);
+  const def = typeof key==='string' ? 0 : 1;
+  $('sTabs').innerHTML = cur.tabs.length>1 ? cur.tabs.map((t,i)=>`<button class="tab" data-tab="${i}">${t.label}</button>`).join('') : '';
+  $('sTabs').style.display = cur.tabs.length>1?'flex':'none';
+  selectTab(def);
+  show('session');
+}
+function selectTab(i){
+  cur.tab=i; cur.list=cur.tabs[i].items;
+  document.querySelectorAll('#sTabs .tab').forEach((t,j)=>t.classList.toggle('on',j===i));
+  const L=$('sList'); clearFigs(L); L.innerHTML='';
+  cur.list.forEach((it,j)=>{
+    const e=EX[it.ex];
+    const b=document.createElement('button'); b.className='item'; b.dataset.i=j;
+    b.innerHTML=`<span class="th"></span><div><div class="n">${e.name}</div><div class="d">${it.dose}</div></div>`;
+    b.onclick=()=>selectEx(j);
+    L.appendChild(b);
+    const svgHost=b.querySelector('.th');
+    makeFig(svgHost, e, {static:1, vb:fitVB(e)});
+    const s=svgHost.firstChild; b.replaceChild(s,svgHost);
+  });
+  selectEx(0);
+}
+let stageFig=null;
+function selectEx(j){
+  cur.idx=j; const it=cur.list[j], e=EX[it.ex];
+  document.querySelectorAll('#sList .item').forEach((b,k)=>b.classList.toggle('on',k===j));
+  const on=document.querySelector('#sList .item.on'); if(on) on.scrollIntoView({block:'nearest',behavior:'smooth'});
+  const host=$('sFig');
+  host.querySelectorAll('svg').forEach(s=>{ figs.forEach(f=>{if(f.svg===s) figs.delete(f)}); s.remove(); });
+  const ph=$('sPhase').children;
+  $('sPhase').style.display = e.hold?'none':'flex';
+  stageFig = makeFig(host, e, {ghost:1, vb:fitVB(e,30,1.5,170), onPhase:l=>{ ph[0].classList.toggle('on',l===0); ph[1].classList.toggle('on',l===1); }});
+  host.appendChild($('sPhase')); host.appendChild($('sView'));
+  $('sView').textContent = VIEWNAME[e.view] + (e.hold?' · position tenue':'');
+  $('sName').textContent=e.name; $('sTip').textContent=e.tip||''; $('sDose').textContent=it.dose;
+}
+$('sPrev').onclick=()=>{ if(cur.idx>0) selectEx(cur.idx-1); else if(cur.tab>0){ selectTab(cur.tab-1); selectEx(cur.list.length-1);} };
+$('sNext').onclick=()=>{ if(cur.idx<cur.list.length-1) selectEx(cur.idx+1); else if(cur.tab<cur.tabs.length-1) selectTab(cur.tab+1); };
+$('sTabs').addEventListener('click',e=>{ const t=e.target.closest('[data-tab]'); if(t) selectTab(+t.dataset.tab); });
+document.addEventListener('click',e=>{ if(e.target.closest('[data-act=home]')){ renderTrack(); renderHome(); show('home'); }});
+// balayage gauche/droite sur la scène
+(()=>{ let x0=null; const st=document.querySelector('.stage');
+  st.addEventListener('touchstart',e=>{x0=e.touches[0].clientX},{passive:true});
+  st.addEventListener('touchend',e=>{ if(x0==null) return; const dx=e.changedTouches[0].clientX-x0; if(Math.abs(dx)>60) (dx<0?$('sNext'):$('sPrev')).click(); x0=null; });
+})();
+
+/* =========================================================
+   8. LECTEUR GUIDÉ
+   ========================================================= */
+function buildSteps(key){
+  const steps=[];
+  const pushEx=(it,sect,extra={})=>steps.push({type:'ex',it,sect,...extra});
+  const pushRest=(sec,sect,label)=>steps.push({type:'rest',time:sec,sect,label});
+  if(typeof key==='string'){
+    const x=EXTRAS[+key.slice(1)];
+    x.items.forEach((it,i)=>{ pushEx(it,x.title); if(x.key==='fin' && i<x.items.length-1) pushRest(20,x.title,'Récupération'); });
+    return steps;
+  }
+  const s=SESSIONS[key];
+  WARMUP.forEach(it=>pushEx(it,'Échauffement'));
+  pushRest(30,'Échauffement','Prépare-toi');
+  s.blocks.forEach((bl,bi)=>{
+    for(let r=1;r<=s.rounds;r++){
+      const sect = (s.blocks.length>1?bl.label+' · ':'')+`Tour ${r}/${s.rounds}`;
+      bl.items.forEach((it,i)=>{
+        pushEx(it,sect);
+        const lastInRound = i===bl.items.length-1;
+        if(!lastInRound) pushRest(40,sect,'Repos');
+        else if(r<s.rounds) pushRest(60,sect,'Repos entre les tours');
+        else pushRest(60,sect, bi<s.blocks.length-1?'Repos avant le bloc suivant':'Repos avant le finisher');
+      });
+    }
+  });
+  FINISHER.forEach((it,i)=>{ pushEx(it,'Finisher cardio'); if(i<FINISHER.length-1) pushRest(20,'Finisher cardio','Récupération'); });
+  pushRest(20,'Étirements','Place-toi pour les étirements');
+  STRETCH.forEach(it=>pushEx(it,'Étirements'));
+  return steps;
+}
+const PL = {steps:[], i:0, t0:0, dur:0, elapsed:0, paused:false, timer:null, beeped:{}};
+let actx=null;
+function beep(f=880,d=.12){ try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)(); const o=actx.createOscillator(), g=actx.createGain(); o.frequency.value=f; o.connect(g); g.connect(actx.destination); g.gain.setValueAtTime(.18,actx.currentTime); g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d); o.start(); o.stop(actx.currentTime+d);}catch(e){} }
+let wake=null;
+async function keepAwake(on){ try{ if(on && 'wakeLock' in navigator) wake=await navigator.wakeLock.request('screen'); else if(wake){ await wake.release(); wake=null; } }catch(e){} }
+const ICON_PAUSE='<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4.5" width="4" height="15" rx="1.2"/><rect x="14" y="4.5" width="4" height="15" rx="1.2"/></svg>';
+const ICON_PLAY='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12.5-7.5z"/></svg>';
+
+function startPlayer(key){
+  PL.key=key; PL.steps=buildSteps(key); PL.i=0;
+  $('player').style.setProperty('--acc',`var(${cur.acc})`);
+  $('pDone').classList.remove('on');
+  show('player'); keepAwake(true); beep(660,.08);
+  goStep(0);
+  clearInterval(PL.timer); PL.timer=setInterval(tick,200);
+}
+function goStep(i){
+  PL.i=Math.max(0,Math.min(i,PL.steps.length-1));
+  const st=PL.steps[PL.i];
+  PL.elapsed=0; PL.t0=Date.now(); PL.paused=false; PL.beeped={}; PL.swShown=false;
+  $('pPause').innerHTML=ICON_PAUSE;
+  $('pBar').style.width=(PL.i/PL.steps.length*100)+'%';
+  const host=$('pFig'); clearFigs(host); host.innerHTML='';
+  const nextEx = PL.steps.slice(PL.i+ (st.type==='ex'?1:1)).find(s=>s.type==='ex');
+  $('player').classList.toggle('restmode', st.type==='rest');
+  $('pSect').innerHTML = `<span class="a">${st.sect}</span>`;
+  if(st.type==='ex'){
+    const e=EX[st.it.ex];
+    makeFig(host,e,{ghost:1, vb:fitVB(e,34,1.1,190)});
+    $('pEy').textContent = VIEWNAME[e.view];
+    $('pName').textContent=e.name; $('pTip').textContent=e.tip||'';
+    if(st.it.time){ PL.dur=st.it.time; ring(st.it.time,st.it.time,'secondes'); $('pMain').textContent='Passer'; }
+    else { PL.dur=0; $('pBig').innerHTML=`<div class="reps"><b>${st.it.reps}</b><span>${typeof st.it.reps==='number'?'répétitions':'répétitions'} · descente en 3 s</span></div>`; $('pMain').textContent='Fait ✓'; }
+  } else {
+    const e = nextEx ? EX[nextEx.it.ex] : null;
+    if(e) makeFig(host,e,{ghost:1, vb:fitVB(e,34,1.1,190)});
+    $('pEy').textContent='Pause'; $('pName').textContent=st.label; $('pTip').textContent= e? 'Prochain exercice : '+e.name : '';
+    PL.dur=st.time; ring(st.time,st.time,'repos'); $('pMain').textContent='Passer le repos';
+  }
+  // aperçu suivant
+  const nx=PL.steps[PL.i+1];
+  const pn=$('pNext'); clearFigs(pn); pn.innerHTML='';
+  const target = st.type==='ex' ? nextEx : nextEx;
+  if(target && (st.type==='ex')){
+    pn.style.display='flex';
+    const holder=document.createElement('span'); pn.appendChild(holder);
+    makeFig(holder,EX[target.it.ex],{static:1,vb:fitVB(EX[target.it.ex])}); pn.replaceChild(holder.firstChild,holder);
+    pn.insertAdjacentHTML('beforeend',`<div><small>Ensuite${nx&&nx.type==='rest'?' · après '+nx.time+' s de repos':''}</small><b>${EX[target.it.ex].name}</b> <span class="badge" style="margin-left:6px;padding:4px 10px;font-size:12px">${target.it.dose}</span></div>`);
+  } else if(st.type==='rest' && nextEx){
+    pn.style.display='flex';
+    const holder=document.createElement('span'); pn.appendChild(holder);
+    makeFig(holder,EX[nextEx.it.ex],{static:0,vb:fitVB(EX[nextEx.it.ex])}); pn.replaceChild(holder.firstChild,holder);
+    pn.insertAdjacentHTML('beforeend',`<div><small>À venir</small><b>${EX[nextEx.it.ex].name}</b> <span class="badge" style="margin-left:6px;padding:4px 10px;font-size:12px">${nextEx.it.dose}</span></div>`);
+  } else pn.style.display='none';
+}
+function ring(left,total,label){
+  const R=46, C=2*Math.PI*R, frac=Math.max(0,left/total);
+  $('pBig').innerHTML=`<div class="ring"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="${R}" fill="none" stroke="var(--card)" stroke-width="7"/><circle id="rg" cx="50" cy="50" r="${R}" fill="none" stroke="var(--acc)" stroke-width="7" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-frac)}" style="transition:stroke-dashoffset .25s linear"/></svg><div class="v"><div><b id="rv">${Math.ceil(left)}</b><small>${label}</small></div></div></div>`;
+}
+function tick(){
+  if(!$('player').classList.contains('on')) return;
+  const st=PL.steps[PL.i]; if(!PL.dur || PL.paused) return;
+  const el = PL.elapsed + (Date.now()-PL.t0)/1000;
+  const left = PL.dur-el;
+  const R=46,C=2*Math.PI*R;
+  const rg=$('rg'), rv=$('rv');
+  if(rg){ rg.setAttribute('stroke-dashoffset', C*(1-Math.max(0,left)/PL.dur)); rv.textContent=Math.max(0,Math.ceil(left)); }
+  const s=Math.ceil(left);
+  if(s<=3 && s>=1 && !PL.beeped[s]){ PL.beeped[s]=1; beep(s===1?990:780,.1); }
+  if(st.type==='ex' && st.it.sw && el>=st.it.sw && !PL.swShown){ PL.swShown=true; const w=$('pSwitch'); w.textContent=st.it.swMsg; w.classList.add('on'); beep(520,.25); setTimeout(()=>w.classList.remove('on'),2200); }
+  if(left<=0){ beep(1200,.25); next(); }
+}
+function next(){ if(PL.i>=PL.steps.length-1) finish(); else goStep(PL.i+1); }
+function finish(){
+  clearInterval(PL.timer); keepAwake(false);
+  let txt='Bravo, c’est fait. Bois un verre d’eau.';
+  if(typeof PL.key==='number'){ markDone(SESSIONS[PL.key].n); const n=store.get().filter(Boolean).length; txt=`Séance ${SESSIONS[PL.key].n} enregistrée · ${n} / 12 séances du programme réalisées.`; }
+  $('pDoneTxt').textContent=txt; $('pDone').classList.add('on'); $('pBar').style.width='100%';
+}
+$('pMain').onclick=()=>next();
+$('pPrev').onclick=()=>goStep(PL.i-1);
+$('pPause').onclick=()=>{
+  if(!PL.dur) return;
+  if(PL.paused){ PL.paused=false; PL.t0=Date.now(); $('pPause').innerHTML=ICON_PAUSE; }
+  else { PL.elapsed += (Date.now()-PL.t0)/1000; PL.paused=true; $('pPause').innerHTML=ICON_PLAY; }
+};
+$('pClose').onclick=()=>{ clearInterval(PL.timer); keepAwake(false); renderTrack(); renderHome(); show(typeof PL.key==='number'||typeof PL.key==='string'?'session':'home'); };
+$('pDoneBtn').onclick=()=>{ renderTrack(); renderHome(); show('home'); };
+$('sGo').onclick=()=>startPlayer(cur.key);
+
+/* init */
+renderTrack(); renderHome();
+setTimeout(()=>{ const r=document.querySelector('.rot'); if(r) r.style.display='none'; },6000);
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol==='https:'){ window.addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
+</script>
+</body>
+</html>
